@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>禮記·曲禮 ～ 風雅敘事 ～</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc@5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc@5/900.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5/400.css">
+<style>
+:root{
+  --ink:#16120f; --paper:#e9dcc0; --gold:#c2a05c; --gold2:#8d6f38; --seal:#9c2b23;
+  --posL:420px; --posC:700px; --posR:980px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0b0908;overflow:hidden;font-family:"Noto Serif TC","Songti TC",serif;color:var(--paper)}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:
+  radial-gradient(ellipse at 50% 40%,#1b1512 0%,#0b0908 70%)}
+#stage{position:absolute;width:1280px;height:720px;left:50%;top:50%;transform-origin:50% 50%;
+  background:#0e0b09;overflow:hidden;box-shadow:0 0 0 2px #3a2f22,0 0 0 6px #1a1512,0 30px 90px rgba(0,0,0,.9)}
+.layer{position:absolute;inset:0}
+#bgLayer{z-index:1}
+#bgLayer svg{width:100%;height:100%;display:block}
+.bgFade{animation:bgIn 1.1s ease both}
+@keyframes bgIn{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+
+#grain{pointer-events:none;z-index:5;background:
+  radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 58%,rgba(0,0,0,.32) 100%);
+  mix-blend-mode:multiply;opacity:.8}
+#grain:after{content:"";position:absolute;inset:0;opacity:.05;background-image:
+  repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px),
+  repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px 4px)}
+
+#fx{pointer-events:none;z-index:2}
+
+/* ============ 立繪位置（已修正：left 由 JS 直接寫入，絕不落在左緣） ============ */
+#charLayer{pointer-events:none;z-index:20}
+.char{position:absolute;bottom:170px;height:500px;width:215px;overflow:visible;
+  left:var(--posC);transform:translateX(-50%);opacity:0;
+  transition:left .5s cubic-bezier(.2,.8,.25,1),opacity .45s,filter .45s;
+  filter:drop-shadow(0 12px 16px rgba(0,0,0,.4))}
+.char.on{opacity:1}
+.char.dim{filter:brightness(.62) saturate(.78) drop-shadow(0 12px 16px rgba(0,0,0,.4))}
+.char svg{width:100%;height:100%;display:block;overflow:visible;animation:breathe 4.8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.char.posL{left:var(--posL)}
+.char.posC{left:var(--posC)}
+.char.posR{left:var(--posR)}
+.pop{animation:pop .5s ease both}
+@keyframes pop{from{opacity:0;transform:translateX(-50%) translateY(18px) scale(.98)}
+  to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+
+/* ---- 狀態列 ---- */
+#hud{position:absolute;left:16px;top:12px;display:flex;gap:7px;z-index:40}
+.stat{width:46px;padding:3px 0 4px;text-align:center;background:linear-gradient(#2a201a,#170f0c);
+  border:1px solid #6d5a38;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(194,160,92,.22),0 3px 8px rgba(0,0,0,.5)}
+.stat b{display:block;font-family:"Ma Shan Zheng",serif;font-size:18px;color:var(--gold);line-height:1.1}
+.stat i{display:block;font-style:normal;font-size:9px;letter-spacing:1px;color:#a08c66;margin-top:1px}
+.stat.up{animation:statUp .6s ease}
+@keyframes statUp{0%{transform:translateY(0)}30%{transform:translateY(-6px);filter:brightness(1.6)}100%{transform:translateY(0)}}
+
+/* ---- 選單列 ---- */
+#menubar{position:absolute;right:12px;top:10px;display:flex;gap:5px;z-index:60;flex-wrap:nowrap}
+.mb{font-family:"Noto Serif TC",serif;font-size:12px;letter-spacing:1px;color:#d8c69c;background:linear-gradient(#241b15,#150f0c);
+  border:1px solid #6d5a38;padding:4px 9px;border-radius:3px;cursor:pointer;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.5);white-space:nowrap}
+.mb:hover{color:#fff3d6;border-color:var(--gold);background:linear-gradient(#3a2c1e,#20170f);transform:translateY(-1px)}
+.mb.act{color:#1a120b;background:linear-gradient(#d8bd84,#b0904f);border-color:#e5d3a4}
+
+/* ---- 對話框 ---- */
+#dialog{position:absolute;left:0;right:0;bottom:0;height:176px;z-index:30;cursor:pointer}
+#dbox{position:absolute;left:26px;right:26px;bottom:12px;height:152px;
+  background:linear-gradient(180deg,rgba(20,15,12,.9),rgba(12,9,7,.96));
+  border:1px solid rgba(194,160,92,.55);border-radius:4px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 0 40px rgba(194,160,92,.07),0 -6px 30px rgba(0,0,0,.5);
+  padding:20px 36px 14px}
+#dbox:before,#dbox:after{content:"";position:absolute;width:24px;height:24px;border:2px solid rgba(194,160,92,.75)}
+#dbox:before{left:6px;top:6px;border-right:0;border-bottom:0}
+#dbox:after{right:6px;bottom:6px;border-left:0;border-top:0}
+#name{position:absolute;left:32px;top:-16px;padding:4px 18px 5px;background:linear-gradient(#a8342a,#7d211a);
+  border:1px solid #d9b478;border-radius:2px;font-family:"Ma Shan Zheng",serif;font-size:20px;letter-spacing:4px;color:#ffeccd;
+  box-shadow:0 4px 12px rgba(0,0,0,.6)}
+#name:empty{display:none}
+#text{font-size:19px;line-height:1.92;letter-spacing:.6px;color:#efe4c8;text-shadow:0 1px 2px #000;min-height:100px}
+#text em{font-style:normal;color:#e6c37a;font-weight:700;border-bottom:1px dotted rgba(230,195,122,.5);padding:0 2px}
+#next{position:absolute;right:24px;bottom:10px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
+  border-top:11px solid var(--gold);opacity:0;animation:nb 1.1s ease-in-out infinite}
+#next.show{opacity:.95}
+@keyframes nb{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ---- 選項 ---- */
+#choices{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  background:radial-gradient(ellipse at center,rgba(10,7,5,.45),rgba(10,7,5,.84));overflow:auto;padding:24px}
+#choices.show{display:flex;animation:fi .35s ease both}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.ctitle{font-family:"Ma Shan Zheng",serif;font-size:25px;color:#e8d3a4;letter-spacing:4px;margin-bottom:6px;text-shadow:0 2px 8px #000;
+  text-align:center;max-width:840px;line-height:1.8}
+.ch{width:660px;padding:14px 24px;background:linear-gradient(90deg,rgba(30,22,16,.95),rgba(18,13,10,.95));
+  border:1px solid rgba(194,160,92,.5);border-left:4px solid var(--gold2);color:#ecdfbe;font-size:18px;letter-spacing:1.5px;
+  cursor:pointer;transition:.22s;text-align:left;font-family:inherit;border-radius:2px;flex:none}
+.ch:hover{background:linear-gradient(90deg,rgba(74,54,30,.96),rgba(38,27,17,.96));border-left-color:var(--gold);
+  color:#fff5dc;transform:translateX(8px);box-shadow:0 6px 22px rgba(0,0,0,.55)}
+.ch small{display:block;font-size:12px;color:#9c8a67;letter-spacing:2px;margin-top:4px}
+.ch.ok{border-left-color:#7fae8b;background:linear-gradient(90deg,rgba(40,66,48,.95),rgba(20,34,24,.95))}
+.ch.no{border-left-color:#a8483c;background:linear-gradient(90deg,rgba(72,32,26,.95),rgba(36,18,15,.95))}
+
+/* ---- 卷軸 / 卡片 ---- */
+#ov{position:absolute;inset:0;z-index:55;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,rgba(8,6,4,.6),rgba(8,6,4,.9));cursor:pointer}
+#ov.show{display:flex;animation:fi .4s ease both}
+.scrollbox{position:relative;width:860px;max-height:604px;overflow:auto;padding:44px 52px;
+  background:linear-gradient(#f0e4c6,#e2d3ae 60%,#d8c69c);color:#2a1f16;
+  border-top:14px solid #6b4a2c;border-bottom:14px solid #6b4a2c;border-radius:3px;
+  box-shadow:0 24px 70px rgba(0,0,0,.8),inset 0 0 60px rgba(140,105,55,.28);
+  animation:unfurl .7s cubic-bezier(.2,.9,.2,1) both}
+@keyframes unfurl{from{transform:scaleY(.06);opacity:.2}to{transform:scaleY(1);opacity:1}}
+.scrollbox h3{font-family:"Ma Shan Zheng",serif;font-size:29px;letter-spacing:8px;text-align:center;color:#7d211a;margin-bottom:6px}
+.scrollbox .sub{text-align:center;font-size:13px;letter-spacing:5px;color:#7a6242;margin-bottom:20px;line-height:1.9}
+.scrollbox .orig{font-family:"Ma Shan Zheng",serif;font-size:26px;line-height:2;text-align:center;color:#241a12;letter-spacing:3px}
+.scrollbox .bd{font-size:16px;line-height:1.95;color:#3a2c1d}
+.tbl{width:100%;border-collapse:collapse;margin-top:6px}
+.tbl th,.tbl td{border:1px solid rgba(107,74,44,.45);padding:7px 11px;font-size:15px;line-height:1.7;text-align:left;vertical-align:top}
+.tbl th{background:rgba(107,74,44,.16);font-weight:700;color:#5a3a1e;width:150px;letter-spacing:2px}
+.sealst{position:absolute;right:20px;bottom:18px;width:50px;height:50px;border:3px solid #a8342a;color:#a8342a;
+  font-family:"Ma Shan Zheng",serif;font-size:30px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;transform:rotate(-8deg);opacity:.8;pointer-events:none}
+.ovhint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;color:#bda97e;letter-spacing:4px;animation:nb2 1.4s infinite}
+@keyframes nb2{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* ---- 章名 ---- */
+#chapterCard{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;
+  background:radial-gradient(ellipse at center,#1a1410 0%,#080605 78%)}
+#chapterCard.show{display:flex;animation:fi .6s ease both}
+#chapterCard .enso{position:absolute;width:520px;height:520px;border:3px solid rgba(194,160,92,.22);border-radius:50%;
+  border-right-color:transparent;border-bottom-color:rgba(194,160,92,.08);animation:spin 26s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#chapterCard .no{font-size:15px;letter-spacing:12px;color:#9c8457;margin-bottom:14px}
+#chapterCard .ti{font-family:"Ma Shan Zheng",serif;font-size:92px;letter-spacing:14px;color:#f0dfb4;text-shadow:0 0 40px rgba(194,160,92,.35);text-align:center}
+#chapterCard .sb{font-size:15px;letter-spacing:5px;color:#a08d68;margin-top:18px;text-align:center;line-height:1.9;max-width:820px}
+#chapterCard .ln{width:220px;height:1px;background:linear-gradient(90deg,transparent,#8d6f38,transparent);margin-top:20px}
+
+/* ---- 視窗 ---- */
+#modal{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(6,4,3,.86)}
+#modal.show{display:flex;animation:fi .3s ease both}
+.panel{width:1000px;height:600px;background:linear-gradient(#1c1510,#120d0a);border:1px solid #6d5a38;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.7),0 30px 80px rgba(0,0,0,.8);display:flex;flex-direction:column;border-radius:3px}
+.phead{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid rgba(194,160,92,.3);
+  background:linear-gradient(90deg,rgba(60,42,24,.5),transparent)}
+.phead h2{font-family:"Ma Shan Zheng",serif;font-size:27px;letter-spacing:8px;color:#e6cf9c;font-weight:400}
+.phead .x{margin-left:auto;cursor:pointer;color:#b7a278;font-size:22px;padding:0 8px;transition:.2s}
+.phead .x:hover{color:#fff;transform:rotate(90deg)}
+.pbody{flex:1;overflow:auto;padding:20px 24px}
+.pbody::-webkit-scrollbar{width:9px}.pbody::-webkit-scrollbar-track{background:#0e0a08}
+.pbody::-webkit-scrollbar-thumb{background:#5a4728;border-radius:4px}
+.tabs{display:flex;gap:6px;padding:10px 22px 0;flex-wrap:wrap}
+.tab{font-size:14px;letter-spacing:3px;padding:6px 14px;border:1px solid #54421f;color:#b09a70;cursor:pointer;border-radius:2px;transition:.2s}
+.tab:hover{color:#ffeccd;border-color:#8d6f38}
+.tab.on{background:linear-gradient(#a8342a,#7d211a);color:#ffeed0;border-color:#d9b478}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.slot{border:1px solid #54421f;background:linear-gradient(#221a13,#171009);padding:12px;cursor:pointer;transition:.2s;border-radius:3px;min-height:120px}
+.slot:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.slot .st{font-size:15px;color:#e2cf9f;letter-spacing:2px;margin-bottom:6px}
+.slot .sd{font-size:12px;color:#8f7c58;line-height:1.8}
+.slot .em{font-family:"Ma Shan Zheng",serif;font-size:18px;color:#5f4e31}
+.logline{border-bottom:1px dashed rgba(194,160,92,.16);padding:9px 4px;font-size:15px;line-height:1.85;color:#cbb98f}
+.logline b{color:#e0b96f;font-weight:700;margin-right:8px;letter-spacing:1px}
+.cx{border:1px solid rgba(194,160,92,.25);margin-bottom:10px;background:linear-gradient(#1d1610,#150f0b);border-radius:3px}
+.cx>.h{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:16.5px;letter-spacing:2px;color:#e3d0a2}
+.cx>.h:hover{background:rgba(194,160,92,.08)}
+.cx>.h .dot{width:8px;height:8px;background:var(--gold);border-radius:50%;flex:none}
+.cx.lock>.h{color:#6b5c42}.cx.lock>.h .dot{background:#3f3423}
+.cx>.b{display:none;padding:4px 18px 16px;font-size:15px;line-height:1.95;color:#c6b48c;border-top:1px solid rgba(194,160,92,.14)}
+.cx.open>.b{display:block}
+.cx .b p{margin-bottom:8px}.cx .b .k{color:#e0b96f}.cx .b .r{color:#d08a7a}
+.cx .b .tbl th,.cx .b .tbl td{color:#c6b48c;border-color:rgba(194,160,92,.25)}
+.cx .b .tbl th{background:rgba(194,160,92,.1);color:#e0b96f}
+.setrow{display:flex;align-items:center;gap:16px;padding:12px 4px;border-bottom:1px dashed rgba(194,160,92,.15);font-size:15px;color:#cbb98f;letter-spacing:2px}
+.setrow label{width:120px;flex:none}
+.setrow .tip{font-size:13px;color:#8f7c58;line-height:2;letter-spacing:1px}
+input[type=range]{flex:1;accent-color:#c2a05c;height:4px}
+input[type=text]{background:#0f0b08;border:1px solid #54421f;color:#efe0bd;padding:9px 12px;font-family:inherit;font-size:16px;border-radius:2px;letter-spacing:3px}
+input[type=text]:focus{outline:none;border-color:var(--gold)}
+
+/* ---- 標題 ---- */
+#title{position:absolute;inset:0;z-index:90;display:flex;background:#0d0a08}
+#title.hide{display:none}
+#tbg{position:absolute;inset:0;opacity:.95}
+#tbg svg{width:100%;height:100%}
+#tmask{position:absolute;inset:0;background:radial-gradient(ellipse at 62% 45%,rgba(8,6,4,.15) 0%,rgba(8,6,4,.8) 75%)}
+#tleft{position:relative;z-index:2;flex:1;display:flex;align-items:center;justify-content:center}
+.tenso{position:absolute;width:440px;height:440px;border:2px solid rgba(194,160,92,.2);border-radius:50%;
+  border-left-color:transparent;animation:spin 40s linear infinite}
+.tmain{text-align:center;position:relative}
+.tmain .kick{font-size:14px;letter-spacing:14px;color:#b7a077;margin-bottom:20px}
+.tmain h1{font-family:"Ma Shan Zheng",serif;font-size:128px;line-height:.98;letter-spacing:10px;color:#f3e3ba;
+  text-shadow:0 0 60px rgba(194,160,92,.35),0 6px 20px rgba(0,0,0,.8);writing-mode:vertical-rl;display:inline-block}
+.tmain .sub{margin-top:22px;font-size:16px;letter-spacing:9px;color:#c9b489}
+.tseal{position:absolute;right:-70px;top:-6px;width:52px;height:52px;border:3px solid #a8342a;color:#a8342a;border-radius:4px;
+  font-family:"Ma Shan Zheng",serif;font-size:30px;display:flex;align-items:center;justify-content:center;transform:rotate(-7deg);opacity:.85}
+#tright{position:relative;z-index:2;width:390px;padding:0 46px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.tbtn{padding:13px 20px;background:linear-gradient(90deg,rgba(28,20,14,.9),rgba(16,11,8,.75));border:1px solid rgba(194,160,92,.34);
+  color:#e3d0a2;font-size:18px;letter-spacing:8px;cursor:pointer;transition:.25s;font-family:inherit;border-radius:2px;text-align:left;
+  display:flex;align-items:center;gap:12px}
+.tbtn:before{content:"";width:16px;height:1px;background:var(--gold);transition:.25s}
+.tbtn:hover{color:#fff4d8;border-color:var(--gold);background:linear-gradient(90deg,rgba(74,54,30,.95),rgba(30,21,14,.85));transform:translateX(-8px)}
+.tbtn:hover:before{width:30px}
+.tname{margin-bottom:22px}
+.tname span{display:block;font-size:12px;letter-spacing:5px;color:#9c8457;margin-bottom:8px}
+.tfoot{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:3px;color:#6d5c42;z-index:3}
+
+/* ---- 結局 ---- */
+#ending{position:absolute;inset:0;z-index:95;display:none;align-items:center;justify-content:center;background:#0a0806}
+#ending.show{display:flex}
+.endbox{width:880px;max-height:640px;overflow:auto;text-align:center;padding:42px 54px;background:linear-gradient(#f0e4c6,#dccca4);color:#241a12;
+  border-top:14px solid #6b4a2c;border-bottom:14px solid #6b4a2c;box-shadow:0 30px 90px rgba(0,0,0,.9);animation:unfurl .8s ease both;position:relative}
+.endbox .rk{font-size:14px;letter-spacing:10px;color:#7a6242}
+.endbox h2{font-family:"Ma Shan Zheng",serif;font-size:70px;letter-spacing:12px;color:#7d211a;margin:8px 0 4px}
+.endbox .ep{font-size:16px;line-height:2.1;color:#3a2c1d;margin:16px 0 22px;text-align:left}
+.endbox .ep em{font-style:normal;color:#8d2b21;font-weight:700}
+.endstat{display:flex;justify-content:center;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+.endstat div{font-size:15px;color:#4a3a24;letter-spacing:2px}
+.endstat b{display:block;font-family:"Ma Shan Zheng",serif;font-size:30px;color:#8d2b21}
+.endbtns{display:flex;gap:12px;justify-content:center}
+.endbtns button{padding:10px 26px;background:linear-gradient(#7d211a,#5c1712);border:1px solid #d9b478;color:#ffeed0;
+  font-family:inherit;font-size:15px;letter-spacing:4px;cursor:pointer;border-radius:2px;transition:.2s}
+.endbtns button:hover{background:linear-gradient(#a8342a,#7d211a);transform:translateY(-2px)}
+#toast{position:absolute;left:50%;top:74px;transform:translateX(-50%) translateY(-16px);z-index:120;padding:9px 26px;
+  background:linear-gradient(#2a1f16,#170f0b);border:1px solid var(--gold);color:#f0dfb4;font-size:14px;letter-spacing:4px;
+  opacity:0;pointer-events:none;transition:.4s;border-radius:2px;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <div id="bgLayer" class="layer"></div>
+  <canvas id="fx" class="layer" width="1280" height="720"></canvas>
+  <div id="charLayer" class="layer"></div>
+  <div id="grain" class="layer"></div>
+
+  <div id="hud">
+    <div class="stat" id="s_j"><b>0</b><i>敬</i></div>
+    <div class="stat" id="s_x"><b>0</b><i>學</i></div>
+    <div class="stat" id="s_w"><b>0</b><i>婉</i></div>
+    <div class="stat" id="s_q"><b>0</b><i>謙</i></div>
+  </div>
+  <div id="menubar">
+    <button class="mb" data-m="save">保存</button>
+    <button class="mb" data-m="load">讀取</button>
+    <button class="mb" data-m="log">回顧</button>
+    <button class="mb" data-m="codex">禮典</button>
+    <button class="mb" id="btnAuto">自動</button>
+    <button class="mb" id="btnSkip">快進</button>
+    <button class="mb" id="btnMusic">音樂</button>
+    <button class="mb" data-m="set">設定</button>
+    <button class="mb" id="btnTitle">標題</button>
+  </div>
+
+  <div id="dialog"><div id="dbox">
+    <div id="name"></div><div id="text"></div><div id="next"></div>
+  </div></div>
+  <div id="choices"></div>
+  <div id="ov"></div>
+  <div id="chapterCard"><div class="enso"></div><div class="no"></div><div class="ti"></div><div class="ln"></div><div class="sb"></div></div>
+  <div id="modal"><div class="panel">
+    <div class="phead"><h2 id="mTitle">禮典</h2><div class="x" id="mClose">✕</div></div>
+    <div class="tabs" id="mTabs"></div>
+    <div class="pbody" id="mBody"></div>
+  </div></div>
+
+  <div id="title">
+    <div id="tbg"></div><div id="tmask"></div>
+    <div id="tleft"><div class="tenso"></div>
+      <div class="tmain">
+        <div class="kick">十三經 · 小戴禮記 · 曲禮</div>
+        <h1>禮記<span style="font-size:50px;color:#c9a86a">曲禮</span></h1>
+        <div class="tseal">禮</div>
+        <div class="sub">～ 風 雅 敘 事 · 古 風 視 覺 小 說 ～</div>
+      </div>
+    </div>
+    <div id="tright">
+      <div class="tname"><span>請 賜 名 姓 （學 生）</span>
+        <input type="text" id="pname" maxlength="6" value="子衿"></div>
+      <button class="tbtn" id="bStart">始 入 書 院</button>
+      <button class="tbtn" id="bCont">續 讀 前 卷</button>
+      <button class="tbtn" id="bCodex">禮 典 · 知 識</button>
+      <button class="tbtn" id="bSet">設 定</button>
+      <button class="tbtn" id="bAbout">本 作 說 明</button>
+    </div>
+    <div class="tfoot">內容依據《禮記》選（〈曲禮〉）與「禮之概談」補充講義編撰 · 點擊對話框或按空白鍵推進</div>
+  </div>
+
+  <div id="ending"><div class="endbox">
+    <div class="rk">結 業 評 第</div><h2 id="eRank">循禮之士</h2>
+    <div class="ep" id="eText"></div>
+    <div class="endstat" id="eStat"></div>
+    <div class="endbtns"><button id="eCodex">閱 覽 禮 典</button><button id="eAgain">重 新 修 習</button></div>
+  </div></div>
+  <div id="toast"></div>
+</div></div>
+
+<script>
+/* ============================================================
+   零、工具
+============================================================ */
+const $=s=>document.querySelector(s);
+const stage=$('#stage');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);
+  stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+addEventListener('resize',fit);fit();
+
+/* ============================================================
+   一、音樂（即時合成古琴氛圍）
+============================================================ */
+const Snd=(()=>{
+  let ctx=null,master=null,on=true,drone=null;
+  const PENT=[146.83,164.81,196.00,220.00,246.94,293.66,329.63,392.00,440.00,493.88];
+  function init(){
+    if(ctx)return;
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
+    master.gain.linearRampToValueAtTime(0.5,ctx.currentTime+2);
+    drone=ctx.createGain();drone.gain.value=0.06;drone.connect(master);
+    [73.42,110].forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;
+      const g=ctx.createGain();g.gain.value=i?0.5:0.8;o.connect(g);g.connect(drone);o.start();});
+    loop();
+  }
+  function pluck(f,v,dur){
+    if(!ctx||!on)return;v=v||0.5;dur=dur||3.2;
+    const t=ctx.currentTime;
+    const o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain(),lp=ctx.createBiquadFilter();
+    o.type='triangle';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*2.005;
+    lp.type='lowpass';lp.frequency.value=1800;lp.Q.value=0.6;
+    const g2=ctx.createGain();g2.gain.value=0.22;o2.connect(g2);g2.connect(lp);
+    o.connect(lp);lp.connect(g);g.connect(master);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+    o.start(t);o2.start(t);o.stop(t+dur+0.1);o2.stop(t+dur+0.1);
+  }
+  function loop(){
+    if(!ctx)return;
+    setTimeout(()=>{
+      if(on){pluck(PENT[Math.floor(Math.random()*PENT.length)],0.16+Math.random()*0.16,3.6);
+        if(Math.random()<0.28)setTimeout(()=>pluck(PENT[Math.floor(Math.random()*6)]*0.5,0.13,4.4),420);}
+      loop();
+    },1600+Math.random()*3200);
+  }
+  return{
+    init,
+    toggle(){init();on=!on;if(master)master.gain.linearRampToValueAtTime(on?0.5:0,ctx.currentTime+0.5);return on;},
+    isOn(){return on;},
+    click(){init();pluck(880+Math.random()*120,0.09,0.5);},
+    page(){init();if(!ctx||!on)return;const t=ctx.currentTime,b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.22),ctx.sampleRate);
+      const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.4)*0.4;
+      const s=ctx.createBufferSource();s.buffer=b;const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=2400;
+      s.connect(f);f.connect(master);s.start(t);},
+    gong(){init();if(!ctx||!on)return;const t=ctx.currentTime;
+      [65.4,98,131].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';
+        o.frequency.value=f*(1+i*0.004);o.connect(g);g.connect(master);
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.34/(i+1),t+0.03);
+        g.gain.exponentialRampToValueAtTime(0.0005,t+4.5);o.start(t);o.stop(t+4.6);});},
+    chime(){init();pluck(1174.66,0.16,2.2);setTimeout(()=>pluck(1567.98,0.1,2.4),140);},
+    wrong(){init();if(!ctx||!on)return;pluck(110,0.2,1.2);setTimeout(()=>pluck(98,0.18,1.4),150);}
+  };
+})();
+
+/* ============================================================
+   二、背景場景（手繪水墨）
+============================================================ */
+const SC={};
+SC.dawn=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="dsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe7d3"/><stop offset=".42" stop-color="#dcd8c2"/><stop offset="1" stop-color="#b3bca8"/></linearGradient>
+<radialGradient id="dsun"><stop offset="0" stop-color="#fff8e2" stop-opacity=".95"/><stop offset="1" stop-color="#fff8e2" stop-opacity="0"/></radialGradient>
+<filter id="dblur"><feGaussianBlur stdDeviation="26"/></filter></defs>
+<rect width="1280" height="720" fill="url(#dsk)"/>
+<circle cx="950" cy="215" r="190" fill="url(#dsun)"/><circle cx="950" cy="215" r="60" fill="#fdf4dc" opacity=".85"/>
+<path d="M0,404 C110,352 190,372 288,332 C392,290 462,340 556,312 C656,282 716,330 812,308 C912,286 992,330 1092,310 C1172,294 1236,318 1280,308 L1280,720 L0,720Z" fill="#c6cfbc" opacity=".85"/>
+<path d="M0,470 C130,428 210,458 320,428 C440,396 520,444 640,424 C760,404 850,448 960,432 C1080,414 1180,452 1280,436 L1280,720 L0,720Z" fill="#a4b099"/>
+<path d="M0,540 C160,512 260,536 400,520 C560,502 660,538 800,528 C940,518 1080,548 1280,532 L1280,720 L0,720Z" fill="#7d8a72"/>
+<g filter="url(#dblur)" opacity=".55" fill="#fff"><ellipse class="mist" cx="300" cy="470" rx="330" ry="34"/><ellipse class="mist m2" cx="900" cy="520" rx="400" ry="30"/><ellipse class="mist m3" cx="620" cy="410" rx="380" ry="22"/></g>
+<path d="M0,600 C200,586 400,606 640,596 C880,586 1080,608 1280,596 L1280,720 L0,720Z" fill="#6c7361"/>
+<g fill="#5c6350" opacity=".5"><path d="M120,720 L180,600 L220,600 L170,720Z"/><path d="M340,720 L392,604 L430,604 L386,720Z"/><path d="M900,720 L946,606 L984,606 L948,720Z"/></g>
+<g fill="#3d4739"><rect x="86" y="380" width="16" height="220"/><path d="M94,392 C40,372 12,330 6,296 C56,300 92,332 100,368Z"/><path d="M94,430 C150,412 186,372 194,336 C142,342 104,376 92,412Z"/><path d="M94,340 C58,318 42,282 44,254 C78,268 96,300 100,330Z"/><path d="M94,470 C46,462 16,436 4,410 C48,406 84,428 98,452Z"/></g>
+<g><rect x="980" y="560" width="200" height="16" rx="3" fill="#6b6350"/><rect x="996" y="576" width="16" height="70" fill="#5d5647"/><rect x="1148" y="576" width="16" height="70" fill="#5d5647"/>
+<g transform="translate(1020,486)"><path d="M0,74 L44,74 L38,58 L6,58Z" fill="#6d5c3c"/><rect x="18" y="34" width="8" height="26" fill="#7d6a45"/><path d="M-2,34 C-2,16 46,16 46,34 L40,44 L4,44Z" fill="#8a7549"/><ellipse cx="22" cy="16" rx="24" ry="6" fill="#9c8553"/></g>
+<g transform="translate(1090,536)" fill="#c9b98d" stroke="#8d7a52" stroke-width="1.5"><rect x="0" y="6" width="72" height="12" rx="3"/><rect x="6" y="-6" width="66" height="12" rx="3"/><rect x="12" y="-18" width="60" height="12" rx="3"/></g></g>
+<g opacity=".8" fill="#4b5342"><path d="M0,690 q40,-40 70,-4 q30,-38 66,-2 q34,-34 70,6Z"/><path d="M1150,700 q40,-44 74,-6 q30,-36 56,4Z"/></g></svg>`;
+
+SC.hall=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="hw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1d15"/><stop offset="1" stop-color="#4a3323"/></linearGradient>
+<linearGradient id="hcol" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a2418"/><stop offset=".4" stop-color="#6d452c"/><stop offset="1" stop-color="#2c1a11"/></linearGradient>
+<pattern id="lat" width="34" height="34" patternUnits="userSpaceOnUse"><rect width="34" height="34" fill="#f0c98a"/><path d="M0,0 H34 M0,17 H34 M0,0 V34 M17,0 V34" stroke="#5b3a22" stroke-width="4"/></pattern>
+<filter id="hsm"><feGaussianBlur stdDeviation="14"/></filter></defs>
+<rect width="1280" height="720" fill="url(#hw)"/>
+<rect y="470" width="1280" height="250" fill="#3a2718"/>
+<g opacity=".55" stroke="#2a1b11" stroke-width="2">${Array.from({length:9},(_,i)=>'<path d="M'+(i*160-40)+',720 L'+(i*90+180)+',470"/>').join('')}</g>
+<rect y="0" width="1280" height="86" fill="#241710"/><rect y="86" width="1280" height="14" fill="#5b3a24"/>
+<g fill="#2e1d13"><rect x="120" y="0" width="46" height="90"/><rect x="500" y="0" width="46" height="90"/><rect x="880" y="0" width="46" height="90"/><rect x="1140" y="0" width="46" height="90"/></g>
+<g><rect x="230" y="150" width="290" height="240" fill="url(#lat)" stroke="#3d2617" stroke-width="12"/><rect x="760" y="150" width="290" height="240" fill="url(#lat)" stroke="#3d2617" stroke-width="12"/></g>
+<g filter="url(#hsm)" opacity=".5" fill="#ffdda6"><ellipse cx="375" cy="270" rx="200" ry="160"/><ellipse cx="905" cy="270" rx="200" ry="160"/></g>
+<g fill="#ffe6b8" opacity=".13"><path class="beam" d="M250,160 L520,160 L760,720 L300,720Z"/><path class="beam b2" d="M780,160 L1040,160 L1180,720 L700,720Z"/></g>
+<g><rect x="60" y="100" width="86" height="500" fill="url(#hcol)"/><rect x="1134" y="100" width="86" height="500" fill="url(#hcol)"/>
+<rect x="46" y="92" width="114" height="20" fill="#7a4d2e"/><rect x="1120" y="92" width="114" height="20" fill="#7a4d2e"/></g>
+<g><rect x="596" y="140" width="88" height="300" fill="#6b2620" stroke="#c2a05c" stroke-width="3"/><rect x="612" y="164" width="56" height="252" fill="#7d2f26"/>
+<rect x="196" y="170" width="60" height="220" fill="#5d231d" stroke="#a9854a" stroke-width="2"/><rect x="1024" y="170" width="60" height="220" fill="#5d231d" stroke="#a9854a" stroke-width="2"/></g>
+<g fill="#8d6a3f"><rect x="360" y="560" width="300" height="26" rx="4"/><rect x="382" y="586" width="20" height="60"/><rect x="618" y="586" width="20" height="60"/></g>
+<g transform="translate(400,520)" fill="#d9c79b" stroke="#8d7a52" stroke-width="1.5"><rect x="0" y="10" width="90" height="14" rx="4"/><rect x="8" y="-4" width="80" height="14" rx="4"/><rect x="16" y="-18" width="70" height="14" rx="4"/></g>
+<g transform="translate(560,506)"><rect x="0" y="10" width="120" height="44" rx="6" fill="#c9b98d" stroke="#8d7a52"/><path d="M6,10 C40,-6 80,-6 114,10" fill="none" stroke="#8d7a52" stroke-width="2"/>
+<line x1="20" y1="24" x2="100" y2="24" stroke="#8d7a52"/><line x1="20" y1="34" x2="86" y2="34" stroke="#8d7a52"/></g>
+<g transform="translate(900,556)"><path d="M0,26 h58 l-6,26 h-46Z" fill="#4a3524"/><rect x="24" y="-6" width="10" height="34" fill="#6b5433"/>
+<path class="smoke" d="M29,-6 C10,-40 52,-56 30,-92 C14,-118 46,-132 32,-160" fill="none" stroke="#e8dcc0" stroke-width="3" opacity=".22" filter="url(#hsm)"/></g>
+<rect y="440" width="1280" height="34" fill="#2c1c12"/><rect y="452" width="1280" height="3" fill="#c8a86a" opacity=".5"/></svg>`;
+
+SC.garden=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="gsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2342"/><stop offset=".45" stop-color="#6b4358"/><stop offset=".78" stop-color="#c9705a"/><stop offset="1" stop-color="#e8a86b"/></linearGradient>
+<radialGradient id="gmoon"><stop offset="0" stop-color="#fffaf0" stop-opacity="1"/><stop offset="1" stop-color="#fffaf0" stop-opacity="0"/></radialGradient>
+<radialGradient id="glan"><stop offset="0" stop-color="#ff9d5c" stop-opacity=".9"/><stop offset="1" stop-color="#ff9d5c" stop-opacity="0"/></radialGradient></defs>
+<rect width="1280" height="720" fill="url(#gsk)"/>
+<circle cx="250" cy="150" r="120" fill="url(#gmoon)" opacity=".55"/><circle cx="250" cy="150" r="46" fill="#fdf6e3" opacity=".95"/>
+<path d="M0,430 C120,398 200,414 300,392 C420,366 520,404 640,392 C780,378 880,408 1000,396 C1120,384 1220,410 1280,400 L1280,470 L0,470Z" fill="#3b2b45" opacity=".85"/>
+<rect y="452" width="1280" height="268" fill="#241a26"/>
+<rect x="0" y="300" width="1280" height="180" fill="#3d2c33"/>
+<circle cx="640" cy="416" r="116" fill="#6b4358" opacity=".55"/>
+<circle cx="640" cy="416" r="116" fill="none" stroke="#8d6a54" stroke-width="10"/>
+<path d="M600,532 L600,430 C600,404 680,404 680,430 L680,532Z" fill="#1d1520" opacity=".5"/>
+<path d="M0,480 C180,470 320,486 500,478 C700,468 880,488 1080,480 C1180,476 1240,482 1280,478 L1280,720 L0,720Z" fill="#2b1f26"/>
+<path d="M120,720 C140,640 190,600 260,584 L268,600 C206,616 168,652 152,720Z" fill="#171018" opacity=".7"/>
+<g stroke="#3a2b22" stroke-width="9" fill="none"><path d="M-10,120 C120,140 240,190 330,268"/><path d="M90,146 C150,180 190,214 214,262"/><path d="M210,196 C258,214 300,246 322,286"/></g>
+<g fill="#f6d3dd">${(()=>{let s='';const pts=[[40,110],[96,140],[150,166],[206,196],[262,232],[310,262],[128,178],[176,214],[222,250],[268,282],[238,208],[286,240],[330,272],[64,150],[186,176],[300,246],[146,222],[200,252]];
+pts.forEach((p,i)=>{const r=6+(i%4)*2;s+='<g transform="translate('+p[0]+','+p[1]+')"><circle r="'+r+'" opacity=".92"/><circle r="'+(r*.45)+'" fill="#e79fb2"/></g>';});return s;})()}</g>
+<g transform="translate(990,430)"><path d="M10,150 L10,80 L70,80 L70,150Z" fill="#5b5049"/><rect x="0" y="66" width="80" height="16" rx="4" fill="#6d6058"/>
+<path d="M6,66 L40,26 L74,66Z" fill="#6d6058"/><rect x="24" y="94" width="32" height="40" fill="#ffd79a" opacity=".9" class="glow"/>
+<circle cx="40" cy="114" r="70" fill="url(#glan)" class="glow"/></g>
+<g class="lant"><line x1="180" y1="0" x2="180" y2="120" stroke="#3a2b22" stroke-width="3"/>
+<ellipse cx="180" cy="164" rx="42" ry="52" fill="#c0392b"/><ellipse cx="180" cy="164" rx="42" ry="52" fill="url(#glan)" opacity=".8"/>
+<rect x="164" y="106" width="32" height="12" fill="#e0c07a"/><rect x="164" y="210" width="32" height="12" fill="#e0c07a"/>
+<path d="M180,222 v34" stroke="#e0c07a" stroke-width="3"/><circle cx="180" cy="262" r="6" fill="#e0c07a"/></g>
+<g class="lant l2"><line x1="1120" y1="0" x2="1120" y2="96" stroke="#3a2b22" stroke-width="3"/>
+<ellipse cx="1120" cy="140" rx="36" ry="45" fill="#c0392b"/><ellipse cx="1120" cy="140" rx="36" ry="45" fill="url(#glan)" opacity=".8"/>
+<rect x="1106" y="90" width="28" height="11" fill="#e0c07a"/><rect x="1106" y="180" width="28" height="11" fill="#e0c07a"/>
+<path d="M1120,191 v28" stroke="#e0c07a" stroke-width="3"/></g>
+<g fill="#ffdf9e" class="fly"><circle cx="420" cy="500" r="3"/><circle cx="520" cy="560" r="2.5"/><circle cx="820" cy="520" r="3"/><circle cx="900" cy="590" r="2"/><circle cx="300" cy="580" r="2.5"/></g>
+<rect y="600" width="1280" height="120" fill="#150f16" opacity=".55"/></svg>`;
+
+SC.temple=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#180d0b"/><stop offset=".6" stop-color="#301613"/><stop offset="1" stop-color="#1b0e0b"/></linearGradient>
+<linearGradient id="brz" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d7540"/><stop offset=".45" stop-color="#5d4a26"/><stop offset="1" stop-color="#3a2e17"/></linearGradient>
+<radialGradient id="cand"><stop offset="0" stop-color="#ffcf7a" stop-opacity=".85"/><stop offset="1" stop-color="#ff9d3c" stop-opacity="0"/></radialGradient>
+<linearGradient id="tcol" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3d1a15"/><stop offset=".45" stop-color="#7a2f24"/><stop offset="1" stop-color="#2b120e"/></linearGradient>
+<filter id="tblur"><feGaussianBlur stdDeviation="20"/></filter></defs>
+<rect width="1280" height="720" fill="url(#tg)"/>
+<g fill="#2a120e"><rect x="0" y="0" width="1280" height="70"/><rect x="90" y="70" width="70" height="540" fill="url(#tcol)"/><rect x="1120" y="70" width="70" height="540" fill="url(#tcol)"/>
+<rect x="330" y="70" width="46" height="520" fill="url(#tcol)" opacity=".85"/><rect x="904" y="70" width="46" height="520" fill="url(#tcol)" opacity=".85"/></g>
+<g fill="#c2a05c" opacity=".7"><rect x="86" y="120" width="78" height="9"/><rect x="86" y="430" width="78" height="9"/><rect x="1116" y="120" width="78" height="9"/><rect x="1116" y="430" width="78" height="9"/></g>
+<path d="M0,586 H1280 V720 H0Z" fill="#241210"/><path d="M0,586 H1280 V600 H0Z" fill="#4a2a20" opacity=".6"/>
+<path d="M520,0 L760,0 L880,720 L400,720Z" fill="#ffe3ab" opacity=".06" filter="url(#tblur)"/>
+<g transform="translate(640,120)" fill="url(#brz)" stroke="#2b2113" stroke-width="2">
+<ellipse cx="-140" cy="0" rx="34" ry="40"/><path d="M-174,-4 h68 v14 h-68Z"/>
+<ellipse cx="140" cy="0" rx="34" ry="40"/><path d="M106,-4 h68 v14 h-68Z"/>
+<ellipse cx="0" cy="-14" rx="30" ry="36"/><path d="M-30,-18 h60 v12 h-60Z"/></g>
+<line x1="640" y1="70" x2="640" y2="106" stroke="#3a2a17" stroke-width="4"/>
+<g transform="translate(300,300)"><rect x="0" y="0" width="18" height="290" fill="#3d2a1a"/><rect x="150" y="0" width="18" height="290" fill="#3d2a1a"/>
+<rect x="-14" y="-12" width="196" height="16" fill="#4a3320"/>
+<ellipse cx="84" cy="120" rx="70" ry="82" fill="#7d3a2c" stroke="#3d2a1a" stroke-width="8"/>
+<ellipse cx="84" cy="120" rx="52" ry="62" fill="none" stroke="#c2a05c" stroke-width="3" opacity=".7"/>
+<g fill="#c2a05c" opacity=".8"><circle cx="84" cy="60" r="5"/><circle cx="84" cy="180" r="5"/><circle cx="30" cy="120" r="5"/><circle cx="138" cy="120" r="5"/></g></g>
+<g transform="translate(880,392)"><rect x="0" y="80" width="150" height="20" fill="#4a3320"/><rect x="14" y="100" width="16" height="100" fill="#3d2a1a"/><rect x="120" y="100" width="16" height="100" fill="#3d2a1a"/>
+<circle cx="75" cy="44" r="44" fill="none" stroke="#6f9280" stroke-width="16"/><circle cx="75" cy="44" r="14" fill="#6f9280" opacity=".5"/></g>
+<g transform="translate(560,470)"><rect x="0" y="60" width="200" height="26" rx="4" fill="#4a3320"/><rect x="20" y="86" width="18" height="80" fill="#3a2718"/><rect x="162" y="86" width="18" height="80" fill="#3a2718"/>
+<g transform="translate(50,0)"><rect x="-7" y="0" width="14" height="62" fill="#e8dcc0"/><path class="flame" d="M0,-2 C10,-14 6,-26 0,-34 C-6,-26 -10,-14 0,-2Z" fill="#ffcf7a"/><circle class="flame" cx="0" cy="-14" r="52" fill="url(#cand)"/></g>
+<g transform="translate(150,0)"><rect x="-7" y="0" width="14" height="62" fill="#e8dcc0"/><path class="flame f2" d="M0,-2 C10,-14 6,-26 0,-34 C-6,-26 -10,-14 0,-2Z" fill="#ffcf7a"/><circle class="flame f2" cx="0" cy="-14" r="52" fill="url(#cand)"/></g></g>
+<g transform="translate(700,540)" fill="url(#brz)"><path d="M0,40 h72 l-8,34 h-56Z"/><path d="M6,20 h60 v20 h-60Z"/><rect x="30" y="-16" width="12" height="38"/>
+<path class="smoke2" d="M36,-16 C16,-52 60,-70 36,-108" fill="none" stroke="#e8dcc0" stroke-width="3" opacity=".18" filter="url(#tblur)"/></g>
+<rect width="1280" height="720" fill="#000" opacity=".18"/></svg>`;
+
+SC.wedding=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0c0b"/><stop offset=".55" stop-color="#6d1c17"/><stop offset="1" stop-color="#3a0f0c"/></linearGradient>
+<radialGradient id="wlan"><stop offset="0" stop-color="#ffd08a" stop-opacity=".95"/><stop offset="1" stop-color="#ff7a3c" stop-opacity="0"/></radialGradient>
+<radialGradient id="wcand"><stop offset="0" stop-color="#fff0c0" stop-opacity=".8"/><stop offset="1" stop-color="#ff9d3c" stop-opacity="0"/></radialGradient>
+<filter id="wblur"><feGaussianBlur stdDeviation="18"/></filter></defs>
+<rect width="1280" height="720" fill="url(#wg)"/>
+<path d="M0,0 C160,90 120,220 0,300Z" fill="#8d1f18" opacity=".9"/><path d="M1280,0 C1120,90 1160,220 1280,300Z" fill="#8d1f18" opacity=".9"/>
+<path d="M120,0 C240,110 210,250 90,340 L0,340 L0,0Z" fill="#a52a20" opacity=".42"/><path d="M1160,0 C1040,110 1070,250 1190,340 L1280,340 L1280,0Z" fill="#a52a20" opacity=".42"/>
+<path d="M0,0 H1280 V64 H0Z" fill="#5c140f"/><rect y="60" width="1280" height="6" fill="#c2a05c" opacity=".65"/>
+<g class="lant"><line x1="330" y1="64" x2="330" y2="150" stroke="#3a1a14" stroke-width="4"/>
+<ellipse cx="330" cy="212" rx="66" ry="76" fill="#d33a2c"/><ellipse cx="330" cy="212" rx="66" ry="76" fill="url(#wlan)" opacity=".75"/>
+<g fill="#a52a20" opacity=".55"><rect x="316" y="138" width="4" height="148"/><rect x="340" y="138" width="4" height="148"/></g>
+<text x="330" y="230" text-anchor="middle" font-family="Ma Shan Zheng,serif" font-size="54" fill="#ffeccd">囍</text>
+<rect x="300" y="130" width="60" height="16" fill="#e0c07a"/><rect x="300" y="282" width="60" height="16" fill="#e0c07a"/>
+<path d="M330,298 v44" stroke="#e0c07a" stroke-width="4"/><circle cx="330" cy="350" r="9" fill="#e0c07a"/></g>
+<g class="lant l2"><line x1="950" y1="64" x2="950" y2="150" stroke="#3a1a14" stroke-width="4"/>
+<ellipse cx="950" cy="212" rx="66" ry="76" fill="#d33a2c"/><ellipse cx="950" cy="212" rx="66" ry="76" fill="url(#wlan)" opacity=".75"/>
+<g fill="#a52a20" opacity=".55"><rect x="936" y="138" width="4" height="148"/><rect x="960" y="138" width="4" height="148"/></g>
+<text x="950" y="230" text-anchor="middle" font-family="Ma Shan Zheng,serif" font-size="54" fill="#ffeccd">囍</text>
+<rect x="920" y="130" width="60" height="16" fill="#e0c07a"/><rect x="920" y="282" width="60" height="16" fill="#e0c07a"/>
+<path d="M950,298 v44" stroke="#e0c07a" stroke-width="4"/><circle cx="950" cy="350" r="9" fill="#e0c07a"/></g>
+<rect y="560" width="1280" height="160" fill="#2a0b09"/><path d="M0,560 H1280 V572 H0Z" fill="#7a2018" opacity=".6"/>
+<g transform="translate(460,430)"><rect x="0" y="60" width="360" height="26" rx="4" fill="#4a2018"/><rect x="24" y="86" width="20" height="86" fill="#3a1812"/><rect x="316" y="86" width="20" height="86" fill="#3a1812"/>
+<rect x="0" y="52" width="360" height="10" fill="#c2a05c" opacity=".7"/>
+<g transform="translate(70,-6)" fill="#8d7540" stroke="#2b2113"><path d="M0,52 h56 l-8,-30 h-40Z"/><path d="M6,22 h44 v8 h-44Z"/><path d="M20,10 h16 v14 h-16Z"/></g>
+<g transform="translate(230,-6)" fill="#8d7540" stroke="#2b2113"><path d="M0,52 h56 l-8,-30 h-40Z"/><path d="M6,22 h44 v8 h-44Z"/><path d="M20,10 h16 v14 h-16Z"/></g>
+<path d="M160,52 C160,20 204,20 204,52Z" fill="#d33a2c"/><path d="M166,52 C166,30 198,30 198,52Z" fill="#f0e0b8" opacity=".3"/></g>
+<g class="cnd"><g transform="translate(180,470)"><rect x="-12" y="0" width="24" height="90" fill="#d33a2c"/><path class="flame" d="M0,-4 C14,-20 8,-38 0,-50 C-8,-38 -14,-20 0,-4Z" fill="#ffe6a8"/><circle class="flame" r="80" cx="0" cy="-20" fill="url(#wcand)"/></g>
+<g transform="translate(1100,470)"><rect x="-12" y="0" width="24" height="90" fill="#d33a2c"/><path class="flame f2" d="M0,-4 C14,-20 8,-38 0,-50 C-8,-38 -14,-20 0,-4Z" fill="#ffe6a8"/><circle class="flame f2" r="80" cx="0" cy="-20" fill="url(#wcand)"/></g></g>
+<g fill="#e0c07a" opacity=".5">${Array.from({length:22},(_,i)=>'<circle cx="'+(60+i*56)+'" cy="'+(566+((i*47)%140))+'" r="'+(2+(i%3))+'"/>').join('')}</g>
+<ellipse cx="640" cy="330" rx="420" ry="130" fill="#ffb37a" opacity=".22" filter="url(#wblur)"/></svg>`;
+
+SC.mourning=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a48"/><stop offset=".55" stop-color="#8d8b84"/><stop offset="1" stop-color="#5c5a54"/></linearGradient>
+<linearGradient id="silk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d8d5cc"/><stop offset=".5" stop-color="#f4f2ea"/><stop offset="1" stop-color="#cfccc2"/></linearGradient>
+<radialGradient id="mcand"><stop offset="0" stop-color="#fff6d8" stop-opacity=".7"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></radialGradient>
+<filter id="mblur"><feGaussianBlur stdDeviation="16"/></filter></defs>
+<rect width="1280" height="720" fill="url(#mg)"/>
+<g opacity=".92">${Array.from({length:9},(_,i)=>{const x=i*150-30;return '<path d="M'+x+',0 C'+(x+40)+',200 '+(x+20)+',420 '+(x+50)+',640 L'+(x+150)+',640 C'+(x+120)+',420 '+(x+140)+',200 '+(x+110)+',0Z" fill="url(#silk)"/><path d="M'+(x+52)+',0 C'+(x+80)+',220 '+(x+64)+',430 '+(x+90)+',640" stroke="#b9b6ac" stroke-width="2" fill="none" opacity=".7"/>';}).join('')}</g>
+<rect y="0" width="1280" height="40" fill="#6d6a62"/><rect y="36" width="1280" height="8" fill="#a8a49a" opacity=".5"/>
+<rect y="620" width="1280" height="100" fill="#4b4941"/>
+<g transform="translate(500,470)"><rect x="0" y="60" width="280" height="22" rx="3" fill="#6d5a44"/><rect x="22" y="82" width="16" height="80" fill="#5a4a37"/><rect x="242" y="82" width="16" height="80" fill="#5a4a37"/>
+<g transform="translate(110,-4)" fill="#7a7568" stroke="#4b4941" stroke-width="2"><path d="M0,60 h60 l-8,-38 h-44Z"/><path d="M8,22 h44 v8 h-44Z"/><rect x="26" y="-14" width="8" height="38"/>
+<path class="smoke" d="M30,-14 C10,-50 54,-70 30,-110" fill="none" stroke="#fff" stroke-width="3" opacity=".2" filter="url(#mblur)"/></g>
+<g fill="#f4f2ea"><circle cx="40" cy="52" r="9"/><circle cx="58" cy="46" r="8"/><circle cx="228" cy="52" r="9"/><circle cx="246" cy="46" r="8"/></g></g>
+<g transform="translate(240,486)"><rect x="-8" y="0" width="16" height="70" fill="#e8e5dc"/><path class="flame" d="M0,-4 C10,-16 6,-30 0,-40 C-6,-30 -10,-16 0,-4Z" fill="#fff3cf" opacity=".85"/><circle class="flame" r="60" cx="0" cy="-16" fill="url(#mcand)"/></g>
+<g transform="translate(1040,486)"><rect x="-8" y="0" width="16" height="70" fill="#e8e5dc"/><path class="flame f2" d="M0,-4 C10,-16 6,-30 0,-40 C-6,-30 -10,-16 0,-4Z" fill="#fff3cf" opacity=".85"/><circle class="flame f2" r="60" cx="0" cy="-16" fill="url(#mcand)"/></g>
+<g class="lant" opacity=".9"><line x1="640" y1="0" x2="640" y2="86" stroke="#5a574e" stroke-width="3"/>
+<ellipse cx="640" cy="140" rx="46" ry="56" fill="#efede4" stroke="#b9b6ac" stroke-width="2"/>
+<rect x="620" y="80" width="40" height="12" fill="#8d8b84"/><path d="M640,196 v26" stroke="#8d8b84" stroke-width="3"/></g>
+<rect width="1280" height="720" fill="#2f2e2a" opacity=".28"/></svg>`;
+
+SC.river=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d2c0"/><stop offset=".45" stop-color="#b8b39c"/><stop offset=".62" stop-color="#8d9089"/><stop offset="1" stop-color="#5c625c"/></linearGradient>
+<filter id="rblur"><feGaussianBlur stdDeviation="12"/></filter></defs>
+<rect width="1280" height="720" fill="url(#rg)"/>
+<g fill="#fff" opacity=".22" filter="url(#rblur)"><ellipse class="mist" cx="280" cy="150" rx="260" ry="42"/><ellipse class="mist m2" cx="900" cy="110" rx="300" ry="34"/><ellipse class="mist m3" cx="620" cy="220" rx="420" ry="28"/></g>
+<path d="M0,392 C120,352 210,372 320,340 C430,308 520,352 640,336 C760,320 860,356 980,342 C1100,328 1200,356 1280,346 L1280,430 L0,430Z" fill="#8d9089" opacity=".7"/>
+<g transform="translate(120,286)" fill="#5b5f57" opacity=".9"><path d="M0,60 h150 v46 h-150Z"/><path d="M-24,60 C20,26 130,26 174,60Z"/><path d="M-24,60 C-40,52 -44,44 -40,38 C-20,44 -8,52 0,60Z"/><path d="M174,60 C190,52 194,44 190,38 C170,44 158,52 150,60Z"/>
+<rect x="58" y="72" width="34" height="34" fill="#41453e"/><path d="M40,26 C80,4 120,10 130,26Z" opacity=".7"/></g>
+<g transform="translate(1000,300)" fill="#5b5f57" opacity=".8"><path d="M0,50 h110 v40 h-110Z"/><path d="M-18,50 C14,24 96,24 128,50Z"/></g>
+<rect y="424" width="1280" height="296" fill="#6e766e"/>
+<g stroke="#a8b0a4" stroke-width="2" opacity=".35" fill="none">${Array.from({length:14},(_,i)=>'<path class="rip r'+(i%3)+'" d="M0,'+(440+i*20)+' q160,-8 320,0 t320,0 t320,0 t320,0"/>').join('')}</g>
+<g transform="translate(560,470)" fill="#3a3d37"><path d="M0,26 C40,42 130,42 176,26 C150,10 30,10 0,26Z"/><path d="M84,26 L84,-30" stroke="#3a3d37" stroke-width="5"/><path d="M84,-30 C110,-24 120,-8 118,4 L84,-6Z"/>
+<circle cx="120" cy="-4" r="9"/></g>
+<g transform="translate(240,530)" fill="#c9b98d" stroke="#8d7a52" stroke-width="1.5" opacity=".95"><rect x="0" y="0" width="86" height="20" rx="4" transform="rotate(-8)"/><rect x="120" y="10" width="86" height="20" rx="4" transform="rotate(6)"/><rect x="250" y="-4" width="70" height="18" rx="4" transform="rotate(-4)"/></g>
+<g fill="#4a4f45" opacity=".9"><path d="M0,720 L0,600 C30,610 40,660 60,720Z"/><path d="M40,720 C46,650 70,616 96,600 C88,650 84,690 92,720Z"/><path d="M1200,720 C1210,640 1240,606 1280,594 L1280,720Z"/></g>
+<g fill="#3a3d37" opacity=".75"><path d="M880,120 q10,-8 20,0 q-10,-4 -20,0Z"/><path d="M930,96 q9,-7 18,0 q-9,-4 -18,0Z"/><path d="M856,86 q8,-6 16,0 q-8,-3 -16,0Z"/></g>
+<rect width="1280" height="720" fill="#2b2a24" opacity=".18"/></svg>`;
+
+SC.study=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#150f0b"/><stop offset="1" stop-color="#2c1e14"/></linearGradient>
+<radialGradient id="lamp"><stop offset="0" stop-color="#ffd79a" stop-opacity=".9"/><stop offset="1" stop-color="#ff9d3c" stop-opacity="0"/></radialGradient>
+<filter id="sblur"><feGaussianBlur stdDeviation="14"/></filter></defs>
+<rect width="1280" height="720" fill="url(#sg)"/>
+<g transform="translate(820,90)"><rect x="0" y="0" width="330" height="300" fill="#1a2a34" stroke="#4a3320" stroke-width="14"/>
+<circle cx="120" cy="90" r="46" fill="#e8eef0" opacity=".85"/><circle cx="120" cy="90" r="80" fill="#e8eef0" opacity=".14" filter="url(#sblur)"/>
+<g stroke="#2b3a2a" stroke-width="7" opacity=".9" fill="none"><path d="M20,300 L20,120"/><path d="M20,150 q30,-14 46,-40"/><path d="M20,190 q34,-10 54,-34"/><path d="M60,300 L60,170"/><path d="M60,200 q26,-12 40,-34"/><path d="M240,300 L240,140"/><path d="M240,180 q30,-14 44,-40"/><path d="M280,300 L280,200"/></g>
+<g stroke="#4a3320" stroke-width="8"><path d="M165,0 V300"/><path d="M0,150 H330"/></g></g>
+<rect y="470" width="1280" height="250" fill="#241710"/><g opacity=".4" stroke="#150d08" stroke-width="2">${Array.from({length:8},(_,i)=>'<path d="M'+(i*170)+',720 L'+(i*100+220)+',470"/>').join('')}</g>
+<g transform="translate(120,180)"><rect x="0" y="0" width="380" height="24" fill="#4a3320"/><rect x="0" y="24" width="18" height="220" fill="#3a2718"/><rect x="362" y="24" width="18" height="220" fill="#3a2718"/>
+<g fill="#c9b98d" stroke="#7d6a45" stroke-width="1.5">${Array.from({length:5},(_,r)=>Array.from({length:5},(_,c)=>'<rect x="'+(30+c*68)+'" y="'+(36+r*40)+'" width="58" height="26" rx="5"/>').join('')).join('')}</g></g>
+<g transform="translate(120,120)"><rect x="0" y="0" width="380" height="20" fill="#4a3320"/>
+<g fill="#d9c79b" stroke="#8d7a52" stroke-width="1.5"><rect x="24" y="-40" width="90" height="40" rx="6"/><rect x="130" y="-34" width="80" height="34" rx="6"/><rect x="230" y="-44" width="100" height="44" rx="6"/></g></g>
+<g transform="translate(300,470)"><rect x="0" y="0" width="680" height="30" rx="4" fill="#5b3f26"/><rect x="40" y="30" width="26" height="120" fill="#3f2b1a"/><rect x="614" y="30" width="26" height="120" fill="#3f2b1a"/>
+<g transform="translate(120,-58)"><rect x="-40" y="46" width="120" height="14" rx="4" fill="#7d5a34"/><rect x="-14" y="0" width="16" height="48" fill="#8d6a3f"/>
+<path class="flame" d="M12,-4 C26,-22 20,-40 12,-52 C4,-40 -2,-22 12,-4Z" fill="#ffd79a"/><circle class="flame" r="120" cx="12" cy="-24" fill="url(#lamp)"/></g>
+<g transform="translate(330,-30)"><rect x="0" y="0" width="230" height="34" rx="4" fill="#e6d8b4" stroke="#8d7a52"/>
+<line x1="18" y1="10" x2="210" y2="10" stroke="#a08c66"/><line x1="18" y1="20" x2="180" y2="20" stroke="#a08c66"/></g>
+<g transform="translate(600,-26)" fill="#3a2718"><rect x="0" y="0" width="46" height="26" rx="4"/><rect x="8" y="-30" width="6" height="34"/><rect x="20" y="-36" width="6" height="40"/><rect x="32" y="-28" width="6" height="32"/></g></g>
+<ellipse cx="440" cy="430" rx="330" ry="150" fill="#ffd79a" opacity=".16" filter="url(#sblur)"/>
+<rect width="1280" height="720" fill="#000" opacity=".2"/></svg>`;
+
+SC.bamboo=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="bsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101d24"/><stop offset=".55" stop-color="#1e3238"/><stop offset="1" stop-color="#131d1c"/></linearGradient>
+<radialGradient id="bmoon"><stop offset="0" stop-color="#f2f6f0" stop-opacity=".95"/><stop offset="1" stop-color="#f2f6f0" stop-opacity="0"/></radialGradient>
+<filter id="bblur"><feGaussianBlur stdDeviation="20"/></filter></defs>
+<rect width="1280" height="720" fill="url(#bsk)"/>
+<circle cx="880" cy="180" r="150" fill="url(#bmoon)" opacity=".45"/><circle cx="880" cy="180" r="62" fill="#f4f7ee" opacity=".9"/>
+<g filter="url(#bblur)" opacity=".3" fill="#cfe0d8"><ellipse class="mist" cx="380" cy="470" rx="380" ry="40"/><ellipse class="mist m2" cx="960" cy="530" rx="420" ry="34"/></g>
+<g>${(()=>{let s='';const cols=[[70,26,'#2c4a3c'],[150,20,'#24402f'],[250,30,'#33543f'],[360,18,'#1e3729'],[470,26,'#2c4a3c'],[1140,22,'#24402f'],[1220,30,'#33543f'],[1050,18,'#1e3729'],[620,14,'#1b3126'],[980,16,'#20392c']];
+cols.forEach(c=>{const x=c[0],w=c[1],col=c[2];
+s+='<g><rect x="'+x+'" y="-20" width="'+w+'" height="760" fill="'+col+'"/>';
+for(let y=40;y<720;y+=110)s+='<rect x="'+(x-3)+'" y="'+y+'" width="'+(w+6)+'" height="7" fill="#48705a" opacity=".75"/>';
+for(let y=90;y<700;y+=220){const dir=(y%2)?1:-1;s+='<g fill="#3d6b52" opacity=".85"><path d="M'+(x+w/2)+','+y+' q'+(dir*60)+',-26 '+(dir*104)+',-6 q'+(-dir*52)+',20 '+(-dir*104)+',6Z"/><path d="M'+(x+w/2)+','+(y+22)+' q'+(dir*54)+',-14 '+(dir*92)+',10 q'+(-dir*50)+',10 '+(-dir*92)+',-10Z"/></g>';}
+s+='</g>';});return s;})()}</g>
+<path d="M0,660 C160,644 300,668 480,656 C680,642 860,668 1060,658 C1170,652 1240,662 1280,656 L1280,720 L0,720Z" fill="#1a2a22" opacity=".9"/>
+<g fill="#4a5a50" opacity=".5">${Array.from({length:9},(_,i)=>'<ellipse cx="'+(90+i*140)+'" cy="690" rx="'+(40+i%3*14)+'" ry="14"/>').join('')}</g>
+<g fill="#ffe9a8" class="fly"><circle cx="420" cy="440" r="3"/><circle cx="520" cy="520" r="2.4"/><circle cx="760" cy="470" r="3"/><circle cx="300" cy="560" r="2.6"/><circle cx="900" cy="560" r="2.2"/></g>
+<rect width="1280" height="720" fill="#04100f" opacity=".28"/></svg>`;
+
+SC.modern=`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="msk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7ecf0"/><stop offset=".5" stop-color="#c6d2d8"/><stop offset="1" stop-color="#9fb0b4"/></linearGradient>
+<filter id="mbl"><feGaussianBlur stdDeviation="10"/></filter></defs>
+<rect width="1280" height="720" fill="url(#msk)"/>
+<circle cx="980" cy="170" r="120" fill="#fff8e2" opacity=".5" filter="url(#mbl)"/>
+<path d="M0,430 C140,392 240,414 360,388 C500,358 600,404 720,392 C860,378 960,410 1080,398 C1180,388 1240,406 1280,400 L1280,470 L0,470Z" fill="#8fa3ab" opacity=".5" filter="url(#mbl)"/>
+<g fill="#7c9099" opacity=".8">${[[40,240,80],[130,180,60],[200,300,90],[300,140,70],[380,260,100],[490,200,64],[560,320,86],[660,160,72],[740,270,96],[850,210,66],[930,300,88],[1030,170,74],[1110,260,92],[1210,200,70]].map(b=>'<rect x="'+b[0]+'" y="'+(520-b[1])+'" width="'+b[2]+'" height="'+b[1]+'"/>').join('')}</g>
+<g fill="#e8f2f6" opacity=".5">${Array.from({length:70},(_,i)=>'<rect x="'+(60+((i*173)%1180))+'" y="'+(250+((i*97)%250))+'" width="7" height="9"/>').join('')}</g>
+<rect y="520" width="1280" height="200" fill="#6d8088"/>
+<g stroke="#8fa3ab" stroke-width="3" opacity=".4" fill="none">${Array.from({length:6},(_,i)=>'<path d="M0,'+(540+i*28)+' H1280"/>').join('')}</g>
+<g opacity=".9" fill="#3f5158"><path d="M120,720 L120,560 C120,520 220,520 220,560 L220,720Z"/><path d="M60,560 C100,520 240,520 280,560 L240,566 C210,548 130,548 100,566Z"/>
+<rect x="150" y="580" width="40" height="140" fill="#2d3b41" opacity=".6"/></g>
+<g opacity=".5" fill="#c9b98d" stroke="#8d7a52" stroke-width="1.5">${Array.from({length:5},(_,i)=>'<rect x="'+(180+i*190)+'" y="'+(560+((i*53)%90))+'" width="76" height="18" rx="4" transform="rotate('+(-14+i*7)+' '+(180+i*190)+' 570)"/>').join('')}</g>
+<rect width="1280" height="720" fill="#2b3a40" opacity=".12"/></svg>`;
+
+const SCENES={dawn:{svg:SC.dawn,fx:{t:'mist',c:'#fff6dd'}},hall:{svg:SC.hall,fx:{t:'dust',c:'#ffe6b8'}},
+ garden:{svg:SC.garden,fx:{t:'petal',c:'#f6c8d4'}},temple:{svg:SC.temple,fx:{t:'ember',c:'#ff9d3c'}},
+ wedding:{svg:SC.wedding,fx:{t:'petal',c:'#e0483a'}},mourning:{svg:SC.mourning,fx:{t:'petal',c:'#f2f0e8'}},
+ river:{svg:SC.river,fx:{t:'mist',c:'#fff6dd'}},study:{svg:SC.study,fx:{t:'dust',c:'#ffd79a'}},
+ bamboo:{svg:SC.bamboo,fx:{t:'firefly',c:'#ffe9a8'}},modern:{svg:SC.modern,fx:{t:'mist',c:'#ffffff'}}};
+
+let curBg=null;
+function setBG(k){
+  if(k===curBg)return;curBg=k;
+  const L=$('#bgLayer');const s=SCENES[k]||SCENES.dawn;
+  L.innerHTML='<div class="bgFade" style="position:absolute;inset:0">'+s.svg+'</div>';
+  setFX(s.fx);Snd.page();
+}
+
+/* ---- 粒子 ---- */
+const cv=$('#fx'),cx2=cv.getContext('2d');let parts=[],fxCfg={t:'mist',c:'#fff'};
+function setFX(c){fxCfg=c;parts=[];const n=c.t==='firefly'?26:c.t==='petal'?40:c.t==='dust'?46:c.t==='ember'?30:22;
+  for(let i=0;i<n;i++)parts.push(mkP(true));}
+function mkP(init){const t=fxCfg.t;return{x:Math.random()*1280,y:init?Math.random()*720:-20,
+  r:t==='petal'?3+Math.random()*4:t==='firefly'?1.6+Math.random()*2:t==='dust'?1+Math.random()*2.4:t==='ember'?1.4+Math.random()*2.6:26+Math.random()*40,
+  vy:t==='petal'?.5+Math.random()*1.1:t==='firefly'?(Math.random()-.5)*.35:t==='dust'?.16+Math.random()*.3:t==='ember'?-.35-Math.random()*.6:.1,
+  vx:t==='petal'?(Math.random()-.5)*.9:t==='firefly'?(Math.random()-.5)*.4:(Math.random()-.5)*.3,
+  a:Math.random()*6.28,va:(Math.random()-.5)*.05,ph:Math.random()*6.28,op:.2+Math.random()*.6};}
+function tickFX(){
+  cx2.clearRect(0,0,1280,720);
+  const c=fxCfg.c,t=fxCfg.t;
+  parts.forEach((p,i)=>{
+    p.y+=p.vy;p.x+=p.vx+Math.sin(p.ph+=.012)*.32;p.a+=p.va;
+    if(t==='mist'){p.x+=.2;if(p.x>1360)p.x=-80;}
+    else if(p.y>740||p.y<-40||p.x<-40||p.x>1320){parts[i]=mkP(false);}
+    cx2.save();cx2.translate(p.x,p.y);cx2.rotate(p.a);cx2.fillStyle=c;
+    if(t==='petal'){cx2.globalAlpha=p.op*.85;cx2.beginPath();cx2.ellipse(0,0,p.r,p.r*.55,0,0,6.3);cx2.fill();}
+    else if(t==='firefly'){cx2.globalAlpha=.25+Math.abs(Math.sin(p.ph*1.6))*.75;cx2.shadowBlur=14;cx2.shadowColor=c;
+      cx2.beginPath();cx2.arc(0,0,p.r,0,6.3);cx2.fill();}
+    else if(t==='mist'){cx2.globalAlpha=.05;cx2.filter='blur(12px)';cx2.beginPath();cx2.ellipse(0,0,p.r*2.4,p.r*.42,0,0,6.3);cx2.fill();}
+    else{cx2.globalAlpha=p.op*.6;cx2.beginPath();cx2.arc(0,0,p.r,0,6.3);cx2.fill();}
+    cx2.restore();
+  });
+  cx2.globalAlpha=1;requestAnimationFrame(tickFX);
+}
+setFX({t:'mist',c:'#fff6dd'});tickFX();
+
+/* ============================================================
+   三、人物立繪
+============================================================ */
+const CH={
+ master:{skin:'#eed3b6',robe:'#4a4a52',robe2:'#3a3a42',trim:'#b0904f',inner:'#d9cfc0',hair:'#e9e6de',accent:'#8d7a52',beard:1},
+ wan:{skin:'#f7e2cf',robe:'#7fa08a',robe2:'#6b8b76',trim:'#d9b478',inner:'#f5efe1',hair:'#2b2320',accent:'#c98b96',buns:1},
+ qian:{skin:'#f0d6ba',robe:'#3c5570',robe2:'#2f4459',trim:'#a9b6c4',inner:'#e8eef2',hair:'#221d1a',accent:'#7d94a8',topknot:1},
+ sage:{skin:'#eed3b6',robe:'#2f2a26',robe2:'#221e1b',trim:'#c2a05c',inner:'#e6dcc8',hair:'#e9e6de',accent:'#b08d4f',beard:1,crown:1}
+};
+function face(p,em){
+  const d='#2a1d18';let g='';
+  const brow=(y1,y2)=>'<path d="M136,'+y1+' q10,-6 20,-2" stroke="'+d+'" stroke-width="3.4" fill="none" stroke-linecap="round"/>'+
+    '<path d="M184,'+y2+' q-10,-6 -20,-2" stroke="'+d+'" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+  if(em==='smile'||em==='shy'){
+    g+='<path d="M138,130 q7,-10 14,0" stroke="'+d+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+       '<path d="M168,130 q7,-10 14,0" stroke="'+d+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+       '<path d="M150,152 q10,11 20,0" stroke="'+d+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+       '<ellipse cx="132" cy="146" rx="12" ry="7" fill="#e08a86" opacity=".3"/><ellipse cx="188" cy="146" rx="12" ry="7" fill="#e08a86" opacity=".3"/>'+brow(112,112);
+  }else if(em==='serious'){
+    g+='<ellipse cx="145" cy="128" rx="5" ry="6" fill="'+d+'"/><ellipse cx="175" cy="128" rx="5" ry="6" fill="'+d+'"/>'+
+       '<path d="M152,154 q8,3 16,0" stroke="'+d+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+       '<path d="M134,112 l22,3" stroke="'+d+'" stroke-width="3.6" stroke-linecap="round"/><path d="M186,112 l-22,3" stroke="'+d+'" stroke-width="3.6" stroke-linecap="round"/>';
+  }else if(em==='think'){
+    g+='<ellipse cx="147" cy="127" rx="5" ry="6.6" fill="'+d+'"/><ellipse cx="177" cy="129" rx="5" ry="6.6" fill="'+d+'"/>'+
+       '<circle cx="148.6" cy="124.6" r="1.6" fill="#fff" opacity=".8"/><circle cx="178.6" cy="126.6" r="1.6" fill="#fff" opacity=".8"/>'+
+       '<path d="M154,155 q6,2 12,0" stroke="'+d+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>'+brow(110,116);
+  }else if(em==='surprise'){
+    g+='<ellipse cx="145" cy="128" rx="7" ry="9" fill="#fff"/><ellipse cx="175" cy="128" rx="7" ry="9" fill="#fff"/>'+
+       '<circle cx="145" cy="129" r="4" fill="'+d+'"/><circle cx="175" cy="129" r="4" fill="'+d+'"/>'+
+       '<ellipse cx="160" cy="157" rx="7" ry="9" fill="#8d4a44"/>'+brow(104,104);
+  }else if(em==='sad'){
+    g+='<path d="M138,130 q7,8 14,0" stroke="'+d+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+       '<path d="M168,130 q7,8 14,0" stroke="'+d+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+       '<path d="M152,158 q8,-6 16,0" stroke="'+d+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>'+
+       '<path d="M134,116 l20,4" stroke="'+d+'" stroke-width="3.2" stroke-linecap="round"/><path d="M186,116 l-20,4" stroke="'+d+'" stroke-width="3.2" stroke-linecap="round"/>';
+  }else{
+    g+='<ellipse cx="145" cy="128" rx="5.4" ry="7.4" fill="'+d+'"/><ellipse cx="175" cy="128" rx="5.4" ry="7.4" fill="'+d+'"/>'+
+       '<circle cx="146.8" cy="125.4" r="1.9" fill="#fff" opacity=".85"/><circle cx="176.8" cy="125.4" r="1.9" fill="#fff" opacity=".85"/>'+
+       '<path d="M153,153 q7,5 14,0" stroke="'+d+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>'+brow(111,111);
+  }
+  return g;
+}
+function charSVG(k,em){
+  em=em||'normal';
+  const p=CH[k];if(!p)return '';
+  let h='';
+  if(p.buns){h='<path d="M114,124 C112,72 134,48 160,48 C186,48 208,72 206,124 C206,138 198,146 190,148 C188,112 176,96 160,96 C144,96 132,112 130,148 C122,146 114,138 114,124Z" fill="'+p.hair+'"/>'+
+   '<circle cx="112" cy="58" r="27" fill="'+p.hair+'"/><circle cx="208" cy="58" r="27" fill="'+p.hair+'"/>'+
+   '<path d="M112,32 q26,10 30,32" stroke="'+p.hair+'" stroke-width="9" fill="none"/>'+
+   '<path d="M208,32 q-26,10 -30,32" stroke="'+p.hair+'" stroke-width="9" fill="none"/>'+
+   '<path d="M92,52 L228,64" stroke="'+p.trim+'" stroke-width="4" fill="none"/>'+
+   '<circle cx="228" cy="64" r="7" fill="#8fc0a4" stroke="'+p.trim+'" stroke-width="2"/>'+
+   '<path d="M228,71 v22" stroke="'+p.trim+'" stroke-width="2"/><circle cx="228" cy="98" r="5" fill="#8fc0a4"/>'+
+   '<path d="M118,120 C112,152 116,178 126,198 L140,192 C130,168 130,142 132,124Z" fill="'+p.hair+'"/>'+
+   '<path d="M202,120 C208,152 204,178 194,198 L180,192 C190,168 190,142 188,124Z" fill="'+p.hair+'"/>';
+  }else if(p.crown){h='<path d="M116,120 C114,76 136,54 160,54 C184,54 206,76 204,120 C204,132 198,140 190,142 C188,110 176,96 160,96 C144,96 132,110 130,142 C122,140 116,132 116,120Z" fill="'+p.hair+'"/>'+
+   '<path d="M124,66 h72 v34 h-72Z" fill="#241d18" stroke="'+p.trim+'" stroke-width="2"/>'+
+   '<rect x="102" y="46" width="116" height="14" rx="3" fill="#2b231c" stroke="'+p.trim+'" stroke-width="2"/>'+
+   '<g stroke="'+p.trim+'" stroke-width="1.6">'+Array.from({length:6},(_,i)=>'<path d="M'+(110+i*20)+',60 v18"/>').join('')+'</g>'+
+   '<g fill="#c0483c">'+Array.from({length:6},(_,i)=>'<circle cx="'+(110+i*20)+'" cy="82" r="4"/>').join('')+'</g>'+
+   '<g stroke="'+p.trim+'" stroke-width="1.6" fill="#8fc0a4"><path d="M112,72 v46"/><circle cx="112" cy="122" r="4"/><path d="M208,72 v46"/><circle cx="208" cy="122" r="4"/></g>';
+  }else{h='<path d="M116,122 C114,74 136,50 160,50 C184,50 206,74 204,122 C204,134 198,142 190,144 C188,110 176,94 160,94 C144,94 132,110 130,144 C122,142 116,134 116,122Z" fill="'+p.hair+'"/>'+
+   '<ellipse cx="160" cy="44" rx="21" ry="17" fill="'+p.hair+'"/><rect x="126" y="38" width="68" height="6" rx="3" fill="'+p.trim+'" transform="rotate(-6 160 41)"/>'+
+   '<path d="M118,118 C112,152 116,178 126,200 L140,194 C130,168 130,142 132,122Z" fill="'+p.hair+'"/>'+
+   '<path d="M202,118 C208,152 204,178 194,200 L180,194 C190,168 190,142 188,122Z" fill="'+p.hair+'"/>';
+  }
+  let beard='';
+  if(p.beard){beard='<path d="M132,150 C124,196 132,248 160,274 C188,248 196,196 188,150 C178,170 170,178 160,178 C150,178 142,170 132,150Z" fill="'+p.hair+'" opacity=".97"/>'+
+   '<path d="M136,148 q24,18 48,0 q-6,20 -24,20 q-18,0 -24,-20Z" fill="'+p.hair+'"/>'+
+   '<path d="M150,236 q10,10 20,0" stroke="#cfcac0" stroke-width="2" fill="none" opacity=".6"/>';
+   if(p.crown)beard+='<path d="M142,262 q18,26 36,0" stroke="'+p.hair+'" stroke-width="8" fill="none" opacity=".8"/>';}
+  const scroll=(k==='master'||k==='wan')?'<g transform="translate('+(k==='wan'?206:196)+',412) rotate(14)">'+
+    '<rect x="0" y="0" width="26" height="94" rx="6" fill="#e2d3ae" stroke="#8d7a52" stroke-width="2"/>'+
+    '<rect x="-4" y="-6" width="34" height="10" rx="4" fill="'+p.accent+'"/><rect x="-4" y="90" width="34" height="10" rx="4" fill="'+p.accent+'"/></g>':'';
+  return '<svg viewBox="0 16 320 744" preserveAspectRatio="xMidYMax meet">'+
+  '<ellipse cx="160" cy="726" rx="128" ry="20" fill="#000" opacity=".28"/>'+
+  '<path d="M100,224 C72,244 44,320 30,424 C24,468 44,488 74,476 C86,404 96,318 106,268Z" fill="'+p.robe2+'"/>'+
+  '<path d="M220,224 C248,244 276,320 290,424 C296,468 276,488 246,476 C234,404 224,318 214,268Z" fill="'+p.robe2+'"/>'+
+  '<path d="M160,182 C126,186 104,200 96,226 C84,286 70,520 56,714 L264,714 C250,520 236,286 224,226 C216,200 194,186 160,182Z" fill="'+p.robe+'"/>'+
+  '<path d="M160,182 C194,186 216,200 224,226 C236,286 250,520 264,714 L206,714 C214,520 206,300 190,232Z" fill="#000" opacity=".1"/>'+
+  '<path d="M56,690 L264,690 L266,714 L54,714Z" fill="'+p.trim+'" opacity=".75"/>'+
+  '<path d="M160,300 L160,690" stroke="'+p.robe2+'" stroke-width="3" opacity=".7"/>'+
+  '<path d="M132,196 L188,196 L176,336 L144,336Z" fill="'+p.inner+'"/>'+
+  '<path d="M132,196 L158,198 L182,336 L156,336Z" fill="'+p.robe+'" stroke="'+p.trim+'" stroke-width="2.4"/>'+
+  '<path d="M188,196 L176,336" stroke="'+p.trim+'" stroke-width="2.4" fill="none"/>'+
+  '<rect x="86" y="336" width="148" height="21" rx="6" fill="'+p.trim+'"/>'+
+  '<rect x="86" y="336" width="148" height="7" fill="#fff" opacity=".14"/>'+
+  '<circle cx="160" cy="346" r="9" fill="'+p.accent+'"/>'+
+  '<path d="M160,357 v30" stroke="'+p.trim+'" stroke-width="3"/>'+
+  '<path d="M148,392 h24 l-6,26 h-12Z" fill="#8fc0a4" stroke="'+p.trim+'" stroke-width="2"/>'+
+  '<path d="M154,418 v18 M160,418 v22 M166,418 v18" stroke="'+p.accent+'" stroke-width="2" fill="none"/>'+
+  '<path d="M146,164 h28 v26 h-28Z" fill="'+p.skin+'"/>'+
+  '<ellipse cx="160" cy="126" rx="41" ry="49" fill="'+p.skin+'"/>'+
+  '<ellipse cx="118" cy="134" rx="7" ry="11" fill="'+p.skin+'"/><ellipse cx="202" cy="134" rx="7" ry="11" fill="'+p.skin+'"/>'+
+  face(p,em)+h+beard+scroll+'</svg>';
+}
+
+/* ★ 立繪座標（整體右移，避免左側被切） ★ */
+const POSPX={L:420,C:700,R:980};
+function posKey(p){
+  p=String(p||'center').toLowerCase();
+  if(p==='left'||p==='l')return 'L';
+  if(p==='right'||p==='r')return 'R';
+  return 'C';
+}
+const charState={};
+function setChars(list){
+  const layer=$('#charLayer');
+  const want={};(list||[]).forEach(c=>{want[c[0]]={pos:c[1],em:c[2]||'normal'};});
+  Object.keys(charState).forEach(k=>{if(!want[k]){const el=charState[k].el;el.classList.remove('on');
+    delete charState[k];setTimeout(()=>{if(!el.classList.contains('on'))el.remove();},520);}});
+  Object.keys(want).forEach(k=>{
+    const w=want[k],pk=posKey(w.pos);
+    let isNew=false;
+    if(!charState[k]){const d=document.createElement('div');d.innerHTML=charSVG(k,w.em);
+      layer.appendChild(d);charState[k]={el:d,em:w.em,pos:''};isNew=true;}
+    const st=charState[k];
+    st.el.style.left=POSPX[pk]+'px';                 /* 直接寫入，確保生效 */
+    st.el.className='char on pos'+pk+(isNew?' pop':'');
+    if(st.em!==w.em){st.el.innerHTML=charSVG(k,w.em);st.em=w.em;}
+    st.pos=pk;
+  });
+}
+function highlight(spKey){
+  Object.keys(charState).forEach(k=>{charState[k].el.classList.toggle('dim',!!spKey&&k!==spKey);});
+}
+
+/* ============================================================
+   四、禮典（知識庫）
+============================================================ */
+const CODEX=[
+{cat:'一、禮之本',items:[
+ {id:'def',n:'「禮」字的定義',b:'<p><span class="k">◎ 作名詞用：</span></p>'+
+ '<p>1. 人類的<span class="r">行為規範</span>。</p>'+
+ '<p>2. 表示尊敬的態度和動作，如：「行禮」、「有禮」。</p>'+
+ '<p>3. 社會生活中，由於道德觀念和風俗習慣而形成的儀式，如：「典禮」、「婚禮」、「喪禮」、「成年禮」。</p>'+
+ '<p>4. 表示慶賀、友好或敬意所贈之物，如：「禮物」、「禮金」。</p>'+
+ '<p>5. 儒家的經典，如：《禮記》。</p>'+
+ '<p><span class="k">◎ 作動詞用：</span></p>'+
+ '<p>1. <span class="r">祭</span>。</p>'+
+ '<p>2. 尊敬、厚待。如：「禮賢下士」。</p>'+
+ '<p><span class="k">◎ 總說：</span>禮是中國傳統文化的特徵——<span class="r">國家的典章制度</span>、<span class="r">社會的生活習慣</span>、<span class="r">個人的行為規範</span>。</p>'},
+ {id:'ori',n:'「禮」字的起源',b:'<p>1. 禮的本字為<span class="r">「豊」</span>，一看就知道與祭祀有關。</p>'+
+ '<p>2. 在甲骨文中，「豊」的<span class="k">頂部</span>就像<span class="r">兩串美玉</span>，<span class="k">底部</span>就像<span class="r">有支架的建鼓</span>。合起來就是「擊鼓奏樂」，用美玉敬奉祖先和神靈。</p>'+
+ '<p>3. 上升到定義，就是<span class="r">履行敬神祈福的儀式</span>。這托盤狀的「豆」，後來也被視作食器或祭器。</p>'+
+ '<p>4. 因為「豊」常被混淆為「豐」。所以在偏旁加上一個<span class="r">「示」</span>字表示<span class="k">祭桌</span>，變成現今的「禮」字。</p>'},
+ {id:'food',n:'食器與祭器 · 民以食為天',b:'<p>在人類文明早期，食器和祭器可不是單純放置食物與祭品的器皿，而是很重要的<span class="r">符號</span>：</p>'+
+ '<p>・<span class="k">食器</span>：象徵基本的<span class="r">物質寄託</span>。</p>'+
+ '<p>・<span class="k">祭器</span>：象徵誠敬的<span class="r">精神寄託</span>。</p>'+
+ '<p>融匯起來，恰巧與「<span class="r">民以食為天</span>」的理念相吻合。</p>'},
+ {id:'first',n:'最初的「禮」',b:'<p>1. 早在<span class="r">文字產生之前</span>，禮就已在人們的生活中逐漸形成。</p>'+
+ '<p>2. 人們在<span class="k">出生、成人、婚娶、生育、疾病、老死、安葬</span>時常舉行特別的儀式。</p>'+
+ '<p>3. 儀式中的人們會配戴不同的飾物、穿著不同的衣服、使用不同的器皿，或歌或舞、或喜或悲。</p>'+
+ '<p>4. 有一定的<span class="r">規矩</span>、一定的<span class="r">程序</span>。</p>'+
+ '<p><span class="k">※ 補充：</span>禮儀是由生活漸漸<span class="r">約定俗成</span>，不可能由一人強制規定。</p>'},
+ {id:'use',n:'禮的功用',b:'<p><span class="k">1. 政治：</span>禮因政治作用而建立。</p>'+
+ '<p><span class="k">2. 文化：</span>促進人類文化的發展。</p>'+
+ '<p><span class="k">3. 教育與倫理：</span>防人惡而導人善。</p>'+
+ '<p><span class="k">4. 社會：</span>融合社會習慣，保持社會秩序。</p>'}
+]},
+{cat:'二、禮之源流',items:[
+ {id:'hist',n:'《禮記》的背景 · 禮樂崩壞',b:'<p><span class="k">西周</span> → 周公「<span class="r">制禮作樂</span>」，將禮提升到<span class="r">治國綱領</span>和<span class="r">社會生活的總規範</span>。</p>'+
+ '<p><span class="k">東周</span> → 周天子權力衰退，諸侯坐大後，禮樂制度自行其是。</p>'+
+ '<p><span class="k">魯定公之後</span> → 開始進入了「<span class="r">禮樂崩壞期</span>」，孔子與其弟子堅持研習各種典禮，希望可以使國家、社會重新有秩序的發展。</p>'+
+ '<p>孔子曰：「<span class="r">克己復禮為仁</span>」。</p>'+
+ '<p><span class="k">戰國時期</span> → 荀況為「禮」之集大成，《荀子》中首見<span class="r">〈禮論〉</span>專篇論禮。</p>'+
+ '<p><span class="k">漢成立後</span> → 叔孫通協助漢高祖制訂漢朝的宮廷禮儀。</p>'+
+ '<p><span class="k">脈絡：</span>「禮樂崩壞」→「重新制定」。</p>'},
+ {id:'sanli',n:'「三禮」',b:'<table class="tbl"><tr><th>名稱</th><th>內容</th></tr>'+
+ '<tr><td>《周禮》</td><td>敘述周代的行政官制和職掌。（<span class="r">政治制度</span>）</td></tr>'+
+ '<tr><td>《儀禮》</td><td>記述古代習俗禮儀。（<span class="r">禮俗</span>）</td></tr>'+
+ '<tr><td>《禮記》</td><td>「<span class="r">禮的理論</span>」，是闡釋「禮」的論著。</td></tr></table>'+
+ '<p style="margin-top:10px">※ 補充說明：《禮記》是戰國、秦漢間儒家論禮文章之集成，是闡釋「禮」的論著；漢代學者講授《儀禮》時，會選擇其中篇章作為補充資料。</p>'},
+ {id:'content',n:'《禮記》的四類內容',b:'<p>1. 說明<span class="r">禮文制度</span>的原意。</p>'+
+ '<p>2. 闡論<span class="r">淑世拯民</span>的道理。（較駁雜）</p>'+
+ '<p>3. 記載<span class="r">祭祀、養老</span>的制度。</p>'+
+ '<p>4. 敘述<span class="r">生活行為的規範</span>。（如〈曲禮〉）</p>'},
+ {id:'book',n:'《禮記》成書過程',b:'<p><span class="k">源頭：</span>孔子與其弟子、後學。</p>'+
+ '<p><span class="k">輯錄：</span>秦、漢間儒者纂集，共 <span class="r">131 篇</span>。</p>'+
+ '<p><span class="k">西漢（漢宣帝時期）：</span></p>'+
+ '<p>・<span class="r">戴德</span>選 85 篇 →《<span class="r">大戴禮記</span>》（亡）。</p>'+
+ '<p>・<span class="r">戴聖</span>選 49 篇 →《<span class="r">小戴禮記</span>》，即今傳《禮記》。</p>'+
+ '<p><span class="k">東漢：</span>鄭玄作<span class="r">注</span>。</p>'+
+ '<p><span class="k">唐：</span>孔穎達作<span class="r">正義</span>，後被收於《<span class="r">十三經</span>》中，保存至今。</p>'+
+ '<p><span class="k">※ 附記：</span>禮儀是由生活漸漸約定俗成，不可能由一人強制規定。</p>'}
+]},
+{cat:'三、吉凶之禮',items:[
+ {id:'hun',n:'婚禮 · 昏禮',b:'<p>中國古代稱婚禮為<span class="r">「昏禮」</span>，因多在<span class="r">黃昏</span>舉行。</p>'+
+ '<p>《禮記》對婚禮所做的規範化的表述：「<span class="r">昏禮者，將合二姓之好，上以事宗廟，而下以繼後世也，故君子重之。</span>」</p>'},
+ {id:'liu',n:'三書六禮',b:'<p>《儀禮》將整套儀式合稱為「<span class="r">三書六禮</span>」。</p>'+
+ '<p><span class="k">三書：</span>指在「六禮」過程中所用的文書，包括<span class="r">聘書、禮書和迎書</span>。</p>'+
+ '<p><span class="k">六禮：</span>分別指<span class="r">納采、問名、納吉、納徵、請期、親迎</span>。</p>'+
+ '<table class="tbl"><tr><th>納采</th><td>男方遣媒納雁為贄，正式提親。</td></tr>'+
+ '<tr><th>問名</th><td>詢問女子之名與生辰，以備占卜。</td></tr>'+
+ '<tr><th>納吉</th><td>卜得吉兆後告於女家，婚約初定。</td></tr>'+
+ '<tr><th>納徵</th><td>致送聘禮，婚約正式成立。</td></tr>'+
+ '<tr><th>請期</th><td>商定並告知迎娶吉日。</td></tr>'+
+ '<tr><th>親迎</th><td>新郎親往女家迎娶，六禮乃成。</td></tr></table>'},
+ {id:'sang',n:'喪禮 · 流程',b:'<p>傳統治喪儀制主要過程得以保留，但如喪儀、喪服制、孝服制等傳統已被<span class="r">「簡化」</span>，完整依儒家舊制者已鮮有見聞。</p>'+
+ '<p><span class="k">喪禮流程：</span><span class="r">小殮 → 報喪 → 奔喪 → 停靈 → 守靈 → 大殮 → 出殯和下葬</span></p>'},
+ {id:'qi',n:'做七 · 斷七',b:'<p><span class="k">燒七：</span>親友每七天去靈堂看望並燒紙錢，一共去七次，共<span class="r">四十九天</span>。還有類似的招魂、超渡、燒紙錢等活動，稱為「<span class="r">做七</span>」。</p>'+
+ '<p>第四十九天的儀式稱為「<span class="r">斷七</span>」，為正式葬禮部分的結束。</p>'},
+ {id:'shou',n:'守孝',b:'<p>按儒家的傳統實際服孝 <span class="r">3 期</span>，每期 <span class="r">9 個月</span>，共 <span class="r">27 個月</span>，孝子應該守護在父母墓的周圍。</p>'+
+ '<p>服孝期間（實際上一般在百日內），<span class="k">不</span>剃頭、刮臉、剪指甲、飲酒、夫妻同房、外出等；逢春節或親友舉辦慶典，亦不拜禮和慶賀。家中女眷也要素妝。</p>'+
+ '<p>現代社會若家中有喪事，第一年春節不去各家拜年。</p>'},
+ {id:'fu',n:'喪服 · 五服制度',b:'<p>喪服：為哀悼死者而穿的服裝。中國古代喪服自<span class="r">周代</span>已用素服（素衣、素裳、素冠等），均取<span class="r">白色</span>。</p>'+
+ '<p>並有<span class="k">五服制度</span>，即按<span class="r">服喪重輕、做工粗細、周期長短</span>，分為 5 等：</p>'+
+ '<table class="tbl"><tr><th>斬衰</th><td>最重。粗麻不縫邊，服期三年。</td></tr>'+
+ '<tr><th>齊衰</th><td>次重。麻布縫邊，服期依親疏而異。</td></tr>'+
+ '<tr><th>大功</th><td>熟麻布製，服期九月。</td></tr>'+
+ '<tr><th>小功</th><td>更細之熟麻布，服期五月。</td></tr>'+
+ '<tr><th>緦麻</th><td>最輕。細麻布，服期三月。</td></tr></table>'}
+]},
+{cat:'四、曲禮六章',items:[
+ {id:'qu',n:'〈曲禮〉題解',b:'<p><span class="k">一、</span>《禮記》首篇篇名。分上、下兩篇。以其篇記<span class="r">吉</span>（祭祀之禮）、<span class="r">凶</span>（逢凶事時所舉行的哀弔禮）、<span class="r">賓</span>（國際間的一種禮節）、<span class="r">軍</span>（軍中的禮儀）、<span class="r">嘉</span>（專指婚禮）五禮之事，明其委屈，故稱為「曲禮」。</p>'+
+ '<p><span class="k">二、</span>多記禮文之細微曲折之處，尤其詳細於<span class="r">言語、飲食、灑掃、應對、進退</span>之法與日常舉止中。</p>'+
+ '<p>※ 本課課文皆選自《禮記》中的〈曲禮〉，注重我們在生活上的表現。</p>'},
+ {id:'ren',n:'克己復禮為仁',b:'<p>孔子曰：「<span class="r">克己復禮為仁</span>」。</p>'+
+ '<p>「仁」的表現就在<span class="k">言語、飲食、灑掃、進退</span>之日常舉止中，就在<span class="k">事親、敬長、問學、交友</span>的行為儀節上，此乃儒家<span class="r">生活教育</span>的實踐。</p>'},
+ {id:'q1',n:'曲禮一 · 毋不敬',b:'<p><span class="k">要旨：</span>待人接物的原則、一切行為的準則以「敬」為基礎。</p>'+
+ '<p><span class="k">原文：</span>曲禮曰：毋不敬，儼若思，安定辭，安民哉！</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">毋不敬</span>：禮莫切於敬，應事接物，無一時一事不可以不敬。敬，自我警惕約束之意。<br>'+
+ '・<span class="r">儼若思</span>：儼通「嚴」，端莊持重。此言儀態端莊持重的樣子。<br>'+
+ '・<span class="r">安定辭</span>：說話謹慎、心平氣和的樣子。安：態度平和。定：論點明確，不模稜兩可。辭：說話。</p>'+
+ '<p><span class="k">語譯：</span>《曲禮》說：一切行為準則皆以「敬」為基礎，態度要端莊持重、若有所思的樣子，說話的時候亦要平和，論點明確、不模稜兩可。這樣才能夠使人信服。</p>'},
+ {id:'q2',n:'曲禮二 · 人生百年',b:'<p><span class="k">要旨：</span>人生百年當中，各成長階段遵從禮制的不同要求。</p>'+
+ '<p><span class="k">原文：</span>人生十年曰幼，學。二十曰弱，冠。三十曰壯，有室。四十曰強，而仕。五十曰艾，服官政。六十曰耆，指使。七十曰老，而傳。八十九十曰耄，七年曰悼。悼與耄，雖有罪不加刑焉。百年曰期，頤。</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">冠</span>：古代二十歲行冠禮，表示成年，體猶未壯，故曰弱。<br>'+
+ '・<span class="r">室</span>：家室，結婚後的小家庭。<br>'+
+ '・<span class="r">仕</span>：為士治理官府小事，引申為為社會服務。<br>'+
+ '・<span class="r">服官政</span>：可以為大夫，擔任國家重要的工作。<span class="r">艾</span>：經驗豐富，辦事老練。<br>'+
+ '・<span class="r">耆</span>：音ㄑㄧˊ，衰老。<span class="r">指使</span>：六十始年老體衰，可藉經驗指導分派工作給別人。<br>'+
+ '・<span class="r">傳</span>：七十告老不堪任事，把職責傳承交付後進。<br>'+
+ '・<span class="r">耄</span>：音ㄇㄠˋ，衰老不再工作。<br>'+
+ '・<span class="r">不加刑</span>：悼者因年少無知，耄者衰老安養而已，雖一時犯錯也不加刑罰。<span class="r">悼</span>：可憐愛的意思。<br>'+
+ '・<span class="r">期</span>：指人生以百年為期，百歲時期已滿。<span class="r">頤</span>：音ㄧˊ，養也。人生百歲惟尊老安養而已。</p>'+
+ '<p><span class="k">語譯：</span>人的一生，十歲時稱為「幼」，開始外出就學；到了二十歲時稱為「弱」，舉行加冠之禮；三十歲時稱作「壯」，已經結婚成立家室；四十歲時稱作「強」，可以出仕做小官；五十歲時稱作「艾」，可以執掌一方治理大眾之事；六十歲時稱作「耆」，能憑藉經驗指導別人做事；七十歲時稱為「老」，應把工作責任交付給後人；八十、九十歲時稱作「耄」。七歲以下的兒童被稱作「悼」。這些兒童和八十、九十歲的老人即使犯了罪，也不得施以刑罰。百歲稱作「期」，將得到社會的供養。</p>'},
+ {id:'q3',n:'曲禮三 · 為人子者',b:'<p><span class="k">要旨：</span>為人子如何孝敬父母與尊事長者，此為<span class="r">家庭倫理</span>之規範。</p>'+
+ '<p><span class="k">原文：</span>夫為人子者：出必告，反必面，所遊必有常，所習必有業。</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">告</span>：稟告，指稟告父母。<br>・<span class="r">反</span>：通「返」，返回。<span class="r">面</span>：面見父母。<br>'+
+ '・<span class="r">遊</span>：結交者。<span class="r">習</span>：修習者。「所遊必有常，所習必有業」：結交品行端正的朋友，修習課程有一定進度，使個人進德修業日益增長，父母就能安心。</p>'+
+ '<p><span class="k">語譯：</span>為人子，出門必須將去處稟告父母，返回時也要先面見父母。結交品行端正的朋友，修習課程有一定進度，使個人進德修業日益增長，父母就能安心。</p>'},
+ {id:'q4',n:'曲禮四 · 侍坐於先生',b:'<p><span class="k">要旨：</span>回答老師問題及向老師請教時的規矩。</p>'+
+ '<p><span class="k">原文：</span>侍坐於先生：先生問焉，終則對。請業則起，請益則起。</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">終則對</span>：指等問話終了後才能回答。<br>・<span class="r">業</span>：課業。<span class="r">起</span>：當起身請教老師。<br>'+
+ '・<span class="r">益</span>：進一步說明，課業有所不明白的地方，須要老師更詳加解說。</p>'+
+ '<p><span class="k">語譯：</span>侍候老師坐著時，老師發問，要等問話結束後再回答。課業有所不明白的地方，須要老師更詳加解說，當起身請教老師。</p>'},
+ {id:'q5',n:'曲禮五 · 侍坐於君子',b:'<p><span class="k">要旨：</span>侍坐於君子面前時的規矩，生活禮儀的常規。</p>'+
+ '<p><span class="k">原文：</span>侍坐於君子，君子欠伸，撰杖屨，視日蚤莫，侍坐者請出矣。</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">侍坐</span>：陪伴長輩坐談。<br>・<span class="r">欠伸</span>：打呵欠伸懶腰。<br>'+
+ '・<span class="r">撰杖屨</span>：撰，執持。尊長想找枴杖或拿鞋子。<br>・<span class="r">蚤莫</span>：早晚。尊長探問時間早晚。以上所指之事皆示尊長有倦意。</p>'+
+ '<p><span class="k">語譯：</span>陪伴著長輩坐談，見尊長者打呵欠、伸懶腰，或想找枴杖或拿鞋子，或是探問時間早晚，侍坐者就該告辭退出。</p>'},
+ {id:'q6',n:'曲禮六 · 君子全交',b:'<p><span class="k">要旨：</span>君子所應具的品德要求，進德修業的圭臬。</p>'+
+ '<p><span class="k">原文：</span>博聞強識而讓，敦善行而不怠，謂之君子。君子不盡人之歡，不竭人之忠，以全交也。</p>'+
+ '<p><span class="k">注釋：</span><br>・<span class="r">博聞強識而讓</span>：見聞廣博記憶力強，且能謙讓不自滿，則所學日益精。<br>'+
+ '・<span class="r">敦善行而不怠</span>：修身踐言而力行不懈，則其德日益進。<br>'+
+ '・<span class="r">不盡人之歡</span>：君子不討好別人，以求別人對己無盡的歡喜。<br>'+
+ '・<span class="r">不竭人之忠</span>：君子也不期望別人，對自己全心全意的愛戴。竭：窮盡。<br>'+
+ '・<span class="r">全交</span>：不勉強、不苛求，朋友之交才能長長久久。</p>'+
+ '<p><span class="k">語譯：</span>見聞廣博記憶力強，且能謙讓不自滿，則所學日益精；修身踐言而力行不懈，則其德日益進。這就叫做君子。君子不討好別人，以求別人對己無盡的歡喜；君子也不期望別人，對自己全心全意的愛戴。不勉強、不苛求，朋友之交才能長長久久。</p>'},
+ {id:'dao',n:'問題討論 · 悼與耄不加刑',b:'<p>「悼與耄，雖有罪不加刑焉。」——七歲以下之兒童與八十九十之老人，雖有罪不加刑罰。</p>'+
+ '<p><span class="k">問題討論：</span>未成年犯罪與老年人犯罪，是不是可以從輕或減輕處罰？</p>'+
+ '<p><span class="k">禮的精神：</span>悼者<span class="r">年少無知</span>，耄者<span class="r">衰老安養</span>而已，故憫幼恤老、教化為先。</p>'+
+ '<p><span class="k">現代思考：</span>現代法制對於未成年與高齡者另有保護、減責與教化處遇之設計，但仍須兼顧<span class="r">被害人權益、社會正義與行為人的責任能力</span>，不可一概而論。「禮」提供的是價值取向，而非取代法律的判斷標準。</p>'}
+]},
+{cat:'五、禮之今用',items:[
+ {id:'sum',n:'〈曲禮〉重點總結',b:'<p>〈曲禮〉內容蘊含<span class="r">親職教育、倫理教育、性別教育</span>等面向，內容包含從<span class="k">個人修身、生活常規、待人接物、家庭倫理</span>，進而擴展至<span class="k">生命的實踐</span>，正可提供現今家庭教育的參考。</p>'+
+ '<table class="tbl"><tr><th>一</th><td>尊師敬長之禮</td></tr><tr><th>二</th><td>孝親之禮</td></tr><tr><th>三</th><td>拜訪與待客之禮</td></tr></table>'},
+ {id:'four',n:'曲禮四大精神',b:'<p><span class="k">一、尊重和謙讓：</span>強調在待人接物中應謙虛有禮，如「毋不敬，儼若思」提倡謹慎和敬重他人。</p>'+
+ '<p><span class="k">二、守禮與規範：</span>通過規定具體行為方式，讓人們在日常生活中遵守禮法，防止隨意和無序的行為。</p>'+
+ '<p><span class="k">三、尊卑有序：</span>強調長幼尊卑的倫理秩序，例如「長者先，幼者後」，提倡按照身份和地位行事，維持社會穩定。</p>'+
+ '<p><span class="k">四、自律與內省：</span>勉勵人們約束自己的行為，保持自律，並經常反省自身，以達到道德提升。</p>'},
+ {id:'now',n:'禮的現代意義',b:'<p><span class="k">一、</span>強調禮儀標準和行為規範，對現代社會建立良好的<span class="r">社會秩序和規範</span>具有重要啟示。</p>'+
+ '<p><span class="k">二、</span>強調倫理道德和內在修養，對於現代社會培養<span class="r">良好公民和個人品格</span>具有積極意義。</p>'+
+ '<p><span class="k">三、</span>蘊含豐富的思想內涵和生活智慧，對於當代社會的<span class="r">精神追求和價值觀</span>提供了重要的參考。</p>'},
+ {id:'apply',n:'曲禮在現代社會生活中的應用',b:'<table class="tbl"><tr><th>尊重他人</th><td>職場中、日常溝通、公共場合、社交媒體。</td></tr>'+
+ '<tr><th>謙虛有禮</th><td>不自滿、不伐善——「博聞強識而讓」。</td></tr>'+
+ '<tr><th>自律與反思</th><td>時間管理、內省修身。</td></tr>'+
+ '<tr><th>建立秩序</th><td>家庭生活、社會層面。</td></tr>'+
+ '<tr><th>文化活動中的應用</th><td>教育、企業文化。</td></tr></table>'}
+]}];
+const ALL_IDS=CODEX.reduce((a,c)=>a.concat(c.items.map(i=>i.id)),[]);
+
+/* ============================================================
+   五、劇本
+============================================================ */
+const NAME={master:'顏夫子',wan:'蘇 婉',qian:'李 子謙',sage:'夢中聖人'};
+let PNAME='子衿';
+function fmt(t){return String(t==null?'':t).replace(/\{p\}/g,PNAME).replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');}
+function plain(t){return fmt(t).replace(/<[^>]+>/g,'');}
+
+const S_=[];
+const A=o=>S_.push(o);
+const say=(sp,t,x)=>A(Object.assign({sp:sp,t:t},x||{}));
+const ch=(n,t,s)=>A({chapter:{n:n,t:t,s:s||''}});
+
+/* ---------- 序章 ---------- */
+ch('序 章','入 門','書院晨曦 · 禮之為物');
+A({bg:'dawn',chars:null});
+say('n','天色未明，山嵐猶濕。{p}背著一卷竹簡，踏過石階，停在「*明倫書院*」的木匾之下。');
+A({bg:'dawn',chars:[['wan','center','smile']]});
+say('wan','「你就是新來的學生吧？我叫蘇婉，比你早入門兩年，你喚我師姐便是。」');
+say('wan','「夫子說過——『*禮者，履也*』。進了這道門，就要一步一步，把禮走成日子。」');
+A({choices:[
+ {t:'拱手為禮：「師姐好，{p}謹受教。」',fx:{j:2,w:2},tip:'敬 加二　婉 加二'},
+ {t:'靦腆一笑：「多謝師姐，還請多多指點。」',fx:{j:1,w:1,x:1},tip:'敬 加一　婉 加一　學 加一'},
+ {t:'四處張望：「這書院……到處都是規矩嗎？」',fx:{x:2,q:1},tip:'學 加二　謙 加一'}]});
+A({bg:'hall',chars:[['master','center','normal']]});
+say('master','「你們兩個，站好了。」');
+say('master','「今日第一課，不講篇章，只講一個字——」');
+A({scroll:{t:'禮',s:'中 國 傳 統 文 化 的 特 徵',lines:['國家的典章制度','社會的生活習慣','個人的行為規範']}});
+say('master','「禮，是中國傳統文化的特徵。它落在三處：*國家的典章制度*、*社會的生活習慣*、*個人的行為規範*。」');
+say('master','「『禮』字作*名詞*用時，共有五義。蘇婉，你說第一義。」');
+A({chars:[['master','left','serious'],['wan','right','normal']]});
+say('wan','「一曰——人類的*行為規範*。」');
+say('wan','「二曰——表示尊敬的態度和動作，如『行禮』、『有禮』。」');
+say('wan','「三曰——社會生活中，由於道德觀念和風俗習慣而形成的儀式，如『典禮』、『婚禮』、『喪禮』、『成年禮』。」');
+say('wan','「四曰——表示慶賀、友好或敬意所贈之物，如『禮物』、『禮金』。」');
+say('wan','「五曰——儒家的經典，如《禮記》。」');
+say('master','「記得清楚。再問：『禮』字作*動詞*用時，又作何解？」');
+A({quiz:{q:'夫子問：「禮」字作動詞用時，意為何者？',o:[['祭；以及尊敬、厚待，如「禮賢下士」',1],['贈送禮物與禮金',0],['指儒家經典《禮記》',0],['指國家的典章制度',0]],
+ exp:'禮作動詞用：一為「祭」，二為「尊敬、厚待」，如「禮賢下士」。其餘三項皆屬名詞用法。'}});
+A({unlock:['def']});
+say('master','「『禮物』、『禮金』是名詞；『禮賢下士』的『禮』，才是動詞——尊敬而厚待賢者。」');
+A({bg:'garden',chars:[['wan','center','smile']]});
+say('wan','「{p}，你可知夫子為何第一課就講『定義』？」');
+say('wan','「因為禮若說不清，人便只把它當作束縛。說清了，才知道它是*把人與人的分寸，畫成可以行走的路*。」');
+A({choices:[
+ {t:'「師姐說得真好。我願從今日開始學走路。」',fx:{w:3,j:1},tip:'婉 加三　敬 加一'},
+ {t:'「可是……規矩太多，會不會讓人失了真心？」',fx:{x:2,q:2},tip:'學 加二　謙 加二'},
+ {t:'「我想先讀典籍，再談體會。」',fx:{x:3},tip:'學 加三'}]});
+say('wan','「問得好。真與禮從來不是兩件事——《曲禮》開篇便說：『*毋不敬*』。真心若不落在舉止上，誰看得見呢？」');
+A({unlock:['use']});
+say('n','暮鼓聲起，第一日的課程落幕。而「禮」這一個字，纔剛在{p}心裡，落下第一筆。');
+
+/* ---------- 第一章 字源 ---------- */
+ch('第 一 章','字 源','豊 · 玉 · 建鼓 · 示');
+A({bg:'temple',chars:[['master','left','serious'],['qian','right','normal']]});
+say('n','翌日，夫子引諸生入山下宗廟。銅器森然，燭影搖紅。');
+say('qian','「夫子，這裡好氣派……這些鍋啊鼎的，都是煮飯的嗎？」');
+say('master','「李子謙。」（夫子一聲，子謙立刻挺直了背。）');
+say('master','「此非鍋鼎，此為*祭器*。今日就從這器，講『禮』字的來處。」');
+A({scroll:{t:'豊',s:'「禮」之本字 · 甲骨文',lines:['頂部：就像兩串美玉','底部：就像有支架的建鼓','合義：擊鼓奏樂，用美玉敬奉祖先和神靈']}});
+say('master','「『禮』的本字為『*豊*』，一看就知道與祭祀有關。」');
+say('master','「在甲骨文中，『豊』的頂部就像*兩串美玉*，底部就像*有支架的建鼓*。合起來就是『擊鼓奏樂』，用美玉敬奉祖先和神靈。」');
+A({chars:[['master','left','normal'],['wan','right','think']]});
+say('wan','「上升到定義，就是*履行敬神祈福的儀式*。」');
+say('wan','「夫子，那托盤狀的『豆』呢？方才案上那只，我也見了。」');
+say('master','「好眼力。這托盤狀的『*豆*』，後來也被視作*食器*或*祭器*。」');
+A({unlock:['ori']});
+say('master','「在人類文明早期，食器和祭器可不是單純放置食物與祭品的器皿，而是很重要的*符號*。」');
+say('master','「食器象徵基本的*物質寄託*，祭器象徵誠敬的*精神寄託*。融匯起來，恰巧與『*民以食為天*』的理念相吻合。」');
+A({unlock:['food']});
+A({card:{t:'民 以 食 為 天',s:'食 器 與 祭 器 的 雙 重 寄 託',rows:[['食 器','象徵基本的物質寄託——養身、養生、養命。'],['祭 器','象徵誠敬的精神寄託——事神、致福、明分。'],['融 匯','融匯起來，恰巧與「民以食為天」的理念相吻合。']]}});
+A({bg:'temple',chars:[['qian','center','surprise']]});
+say('qian','「夫子！我寫『豊』字時，同窗總說我寫成了『豐』！」');
+say('master','「這正是關鍵。因為『豊』常被混淆為『*豐*』。所以在偏旁加上一個『*示*』字表示*祭桌*，變成現今的『*禮*』字。」');
+A({card:{t:'由 豊 至 禮',s:'字 形 演 變',rows:[['豊','本字。頂部就像兩串美玉，底部就像有支架的建鼓；擊鼓奏樂，用美玉敬奉祖先和神靈。'],['混淆','「豊」常被混淆為「豐」，易生訛誤。'],['加「示」','在偏旁加上一個「示」字表示祭桌。'],['禮','遂成現今的「禮」字。']]}});
+A({bg:'garden',chars:[['wan','left','smile'],['qian','right','normal']]});
+say('wan','「所以『禮』一開始，不是課本上的條文，而是人對著天地鬼神，認真地做了一件事。」');
+say('qian','「那……最早的禮，是什麼模樣？」');
+A({unlock:['first']});
+A({card:{t:'最 初 的 「禮」',s:'文 字 之 前 · 生 活 之 中',rows:[
+ ['時 序','早在文字產生之前，禮就已在人們的生活中逐漸形成。'],
+ ['儀 節','人們在出生、成人、婚娶、生育、疾病、老死、安葬時常舉行特別的儀式。'],
+ ['儀 容','儀式中的人們會配戴不同的飾物、穿著不同的衣服、使用不同的器皿，或歌或舞、或喜或悲。'],
+ ['規 則','有一定的規矩、一定的程序。'],
+ ['補 充','禮儀是由生活漸漸「約定俗成」，不可能由一人強制規定。']]}});
+say('wan','「*或歌或舞、或喜或悲*——這八個字最動人。禮不是面無表情的，禮是有溫度的。」');
+A({choices:[
+ {t:'「是的。禮本於情，形於儀。」',fx:{j:2,w:2},tip:'敬 加二　婉 加二'},
+ {t:'「可是若只有情，沒有程序，豈不流於放縱？」',fx:{x:3,j:1},tip:'學 加三　敬 加一'},
+ {t:'「子謙，你出生時行過什麼禮？」（打趣）',fx:{q:3},tip:'謙 加三'}]});
+say('qian','「我娘說，我出生三日行了洗三之禮，滿月剃髮，抓週抓了一枚印章——結果現在連字都寫不好。」');
+say('wan','（蘇婉笑彎了眼。）「所以你更該好好學禮。」');
+
+/* ---------- 第二章 功用 ---------- */
+ch('第 二 章','禮 之 用','政治 · 文化 · 教育倫理 · 社會');
+A({bg:'hall',chars:[['master','center','normal']]});
+say('master','「禮既已成形，它究竟有何用？記住四條。」');
+A({card:{t:'禮 的 功 用',s:'四 大 面 向',rows:[
+ ['政 治','禮因政治作用而建立。'],
+ ['文 化','促進人類文化的發展。'],
+ ['教育與倫理','防人惡而導人善。'],
+ ['社 會','融合社會習慣，保持社會秩序。']]}});
+A({unlock:['use']});
+A({chars:[['master','left','serious'],['qian','right','serious']]});
+say('qian','「夫子，學生有一問。『防人惡而導人善』——若人性本惡，禮是繩索；若人性本善，禮豈非多餘？」');
+say('master','「問得好。你如何看，{p}？」');
+A({choices:[
+ {t:'「禮如堤防：平時無用，洪水來時方知其貴。」',fx:{x:3,j:2},tip:'學 加三　敬 加二'},
+ {t:'「禮如琴弦：太緊則斷，太鬆則不鳴，貴在得中。」',fx:{x:2,j:1,w:2},tip:'學 加二　敬 加一　婉 加二'},
+ {t:'「禮是習慣的累積，非為防人，而為成人。」',fx:{j:3,x:1},tip:'敬 加三　學 加一'}]});
+say('master','（夫子撫鬚。）「三說皆可。禮不是要人*怕*，而是要人*安*——安於分，安於情，安於序。」');
+say('wan','「政治建其制，文化成其華，教育導其善，社會保其序。四者缺一，禮便只是空殼。」');
+A({bg:'garden',chars:[['wan','center','think']]});
+say('wan','「{p}，你說現代人還需要這些嗎？」');
+say('wan','「我讀到一句：禮的現代意義，在於建立*良好的社會秩序與規範*、培養*良好公民與個人品格*，並為當代的*精神追求與價值觀*提供重要的參考。」');
+say('wan','「三千年前的事，居然能對著今天說話。」');
+A({choices:[
+ {t:'「因為人與人相處的本質，從未改變。」',fx:{w:3,x:1},tip:'婉 加三　學 加一'},
+ {t:'「或許形式會變，但『敬』不會過時。」',fx:{w:2,j:2},tip:'婉 加二　敬 加二'}]});
+A({unlock:['now']});
+
+/* ---------- 第三章 禮樂崩壞 ---------- */
+ch('第 三 章','禮 樂 崩 壞','周公 · 孔子 · 荀子 · 叔孫通');
+A({bg:'river',chars:null});
+say('n','是夜，{p}伏案讀史，燭盡而眠。夢中，一道長河緩緩展開——');
+A({bg:'river',chars:[['sage','center','normal']]});
+say('sage','「小子，你來得正好。且隨我看這條河。」');
+say('n','那人身著玄衣纁裳，頭戴冕旒，氣度淵深。{p}忽然明白：這是*周公*。');
+A({unlock:['hist']});
+A({card:{t:'禮 樂 之 河',s:'由 盛 而 衰 · 由 衰 而 復',rows:[
+ ['西 周','周公「制禮作樂」，將禮提升到治國綱領和社會生活的總規範。'],
+ ['東 周','周天子權力衰退，諸侯坐大後，禮樂制度自行其是。'],
+ ['魯定公之後','開始進入了「禮樂崩壞期」，孔子與其弟子堅持研習各種典禮，希望可以使國家、社會重新有秩序的發展。'],
+ ['戰國時期','荀況為「禮」之集大成，《荀子》中首見〈禮論〉專篇論禮。'],
+ ['漢成立後','叔孫通協助漢高祖制訂漢朝的宮廷禮儀。'],
+ ['總 結','「禮樂崩壞」→「重新制定」。']]}});
+say('sage','「我制禮作樂，不是為了好看。是要讓天下人知道：*君君、臣臣、父父、子子*，各安其位，則百姓安。」');
+say('sage','「可是後來，周天子權力衰退，諸侯坐大，禮樂制度便自行其是——鐘鼓依舊，心意已非。」');
+A({choices:[
+ {t:'「那……禮壞了，是禮的錯，還是人的錯？」',fx:{x:3,j:1},tip:'學 加三　敬 加一'},
+ {t:'「所以孔子才要一生奔走，研習典禮。」',fx:{j:3,x:1},tip:'敬 加三　學 加一'},
+ {t:'「周公，我想再看清楚一些。」',fx:{w:1,x:1,q:1},tip:'婉 加一　學 加一　謙 加一'}]});
+say('sage','「禮由人行。人若失敬，鐘鼓便是噪音；人若存敬，一瓢一飲皆是禮。」');
+say('n','夢影一轉，長河上浮現一位布衣老者，身後跟著一群同樣風塵僕僕的弟子。');
+say('n','那是*孔子*。他對弟子說：「克己復禮為仁。」');
+A({unlock:['ren']});
+A({card:{t:'克 己 復 禮 為 仁',s:'儒 家 生 活 教 育 的 實 踐',rows:[
+ ['仁的表現','就在言語、飲食、灑掃、進退之日常舉止中。'],
+ ['亦在於','事親、敬長、問學、交友的行為儀節上。'],
+ ['結 論','此乃儒家生活教育的實踐。']]}});
+say('n','再一轉，戰國的書齋裡，一位學者正執筆寫下〈禮論〉——那是*荀況*，「禮」之集大成者。');
+say('n','最後，漢家宮殿之上，*叔孫通*為漢高祖制訂漢朝的宮廷禮儀，群臣拜賀，莫不有序。');
+say('sage','「記住這條河。禮不是化石，它一次次崩壞，又一次次被重新制定。」');
+A({bg:'study',chars:[['wan','left','think'],['qian','right','normal']]});
+say('wan','「{p}？{p}！你趴在案上睡著了，口水都要滴到簡上了。」');
+say('n','{p}猛然醒來，夢中長河猶在眼前。窗外，天光已亮。');
+say('qian','「你夢裡一直念『崩壞』、『重新制定』……是不是被夫子嚇到了？」');
+A({choices:[
+ {t:'「我夢見了周公，還見了孔子、荀子、叔孫通。」',fx:{x:2,w:2},tip:'學 加二　婉 加二'},
+ {t:'「只是讀書讀得太晚罷了。」（不置可否）',fx:{j:1},tip:'敬 加一'}]});
+say('wan','（蘇婉怔了一下，隨即認真地看著你。）「那你可要把這夢，講給夫子聽。」');
+
+/* ---------- 第四章 三禮與成書 ---------- */
+ch('第 四 章','三 禮 成 書','周禮 · 儀禮 · 禮記');
+A({bg:'hall',chars:[['master','center','serious']]});
+say('master','「{p}昨夜夢周公？」（夫子淡淡一笑。）「夢得正好。今日講書。」');
+say('master','「談禮，先分『*三禮*』。」');
+A({card:{t:'三 禮',s:'名 稱 與 內 容',rows:[
+ ['《周禮》','敘述周代的行政官制和職掌。（政治制度）'],
+ ['《儀禮》','記述古代習俗禮儀。（禮俗）'],
+ ['《禮記》','「禮的理論」——是闡釋「禮」的論著。']]}});
+A({unlock:['sanli']});
+A({quiz:{q:'下列配對，何者正確？',o:[['《周禮》——政治制度；《儀禮》——禮俗；《禮記》——禮的理論',1],
+ ['《周禮》——禮的理論；《儀禮》——政治制度；《禮記》——禮俗',0],
+ ['《周禮》——禮俗；《儀禮》——禮的理論；《禮記》——政治制度',0],
+ ['三書皆為記述古代習俗禮儀之書',0]],
+ exp:'《周禮》敘述周代的行政官制和職掌（政治制度）；《儀禮》記述古代習俗禮儀（禮俗）；《禮記》是「禮的理論」，為闡釋「禮」的論著。'}});
+say('master','「《禮記》是*戰國、秦漢間*儒家論禮文章之集成，是闡釋『禮』的論著。」');
+say('master','「漢代學者講授《儀禮》時，會選擇其中篇章作為*補充資料*——久而久之，這些補充自成一書。」');
+A({card:{t:'《禮記》的 內 容',s:'四 類',rows:[
+ ['一','說明禮文制度的原意。'],
+ ['二','闡論淑世拯民的道理。（較駁雜）'],
+ ['三','記載祭祀、養老的制度。'],
+ ['四','敘述生活行為的規範。（如〈曲禮〉）']]}});
+A({unlock:['content']});
+say('master','「再說成書。」');
+A({card:{t:'《禮 記》成 書 過 程',s:'由 一 百 三 十 一 篇 至 十 三 經',rows:[
+ ['源 頭','孔子與其弟子、後學。'],
+ ['輯 錄','秦、漢間儒者纂集，共一百三十一篇。'],
+ ['戴 德','選八十五篇，成《大戴禮記》（亡）。'],
+ ['戴 聖','選四十九篇，成《小戴禮記》——漢宣帝時期，即今傳《禮記》。'],
+ ['鄭 玄','東漢，為之作「注」。'],
+ ['孔穎達','唐代，為之作「正義」。'],
+ ['定 位','後被收於《十三經》中，保存至今。']]}});
+A({unlock:['book']});
+A({quiz:{q:'關於《禮記》成書，下列何者正確？',o:[['戴聖選四十九篇成《小戴禮記》，東漢鄭玄作注，唐孔穎達作正義',1],
+ ['戴德選四十九篇成《大戴禮記》，流傳至今',0],
+ ['《禮記》由孔子一人親手寫定，共一百三十一篇',0],
+ ['鄭玄作正義，孔穎達作注',0]],
+ exp:'戴德選八十五篇為《大戴禮記》（亡）；戴聖選四十九篇為《小戴禮記》，即今本《禮記》。東漢鄭玄作「注」，唐孔穎達作「正義」，後被收於《十三經》中，保存至今。'}});
+A({chars:[['master','left','normal'],['qian','right','surprise']]});
+say('qian','「八十五篇的那一部竟然亡佚了……那我們今天讀的，全是戴聖選的四十九篇？」');
+say('master','「正是。所以你們手中的每一句，都是兩千年前有人*替你們留下來的*。」');
+say('master','「還有一句要記：*禮儀是由生活漸漸約定俗成，不可能由一人強制規定*。」');
+A({bg:'study',chars:[['wan','center','smile']]});
+say('wan','「約定俗成……所以禮不是誰發明的，是所有人一起*活*出來的。」');
+say('wan','「{p}，你說，我們今天做的每一件事，是不是也在替後人寫禮？」');
+A({choices:[
+ {t:'「是。所以更要慎重。」',fx:{j:3,w:2},tip:'敬 加三　婉 加二'},
+ {t:'「那我們豈不責任重大？」',fx:{x:2,w:2},tip:'學 加二　婉 加二'},
+ {t:'「我只希望別把簡冊寫錯了。」',fx:{q:3,w:1},tip:'謙 加三　婉 加一'}]});
+
+/* ---------- 第五章 昏禮 ---------- */
+ch('第 五 章','昏 禮','三書六禮 · 黃昏之約');
+A({bg:'wedding',chars:[['master','left','normal'],['qian','right','normal']]});
+say('n','山下村中辦喜事。夫子命三學生前往觀禮，並記其儀節。');
+say('qian','「奇怪，喜宴為何要等到太陽下山才開始？」');
+say('master','「這就是關鍵。中國古代稱婚禮為『*昏禮*』，因多在*黃昏*舉行。」');
+A({scroll:{t:'昏 禮',s:'《禮 記》',lines:['昏禮者，將合二姓之好，','上以事宗廟，而下以繼後世也，','故君子重之。']}});
+say('master','「『*昏禮者，將合二姓之好，上以事宗廟，而下以繼後世也，故君子重之*。』」');
+say('master','「上，是對祖先——事宗廟；下，是對子孫——繼後世。中間，是兩個家族結為一好。所以君子重之。」');
+A({unlock:['hun']});
+A({chars:[['master','left','normal'],['wan','right','smile'],['qian','center','normal']]});
+say('wan','「《儀禮》將整套儀式合稱為『*三書六禮*』。」');
+A({card:{t:'三 書 六 禮',s:'《儀 禮》婚 儀 全 制',rows:[
+ ['三 書','指在「六禮」過程中所用的文書，包括：聘書、禮書和迎書。'],
+ ['六 禮','納采 → 問名 → 納吉 → 納徵 → 請期 → 親迎。'],
+ ['納 采','男方遣媒納雁為贄，正式提親。'],
+ ['問 名','詢問女子之名與生辰，以備占卜。'],
+ ['納 吉','卜得吉兆後告於女家，婚約初定。'],
+ ['納 徵','致送聘禮，婚約正式成立。'],
+ ['請 期','商定並告知迎娶吉日。'],
+ ['親 迎','新郎親往女家迎娶，六禮乃成。']]}});
+A({unlock:['liu']});
+A({quiz:{q:'「六禮」的正確順序是？',o:[['納采 → 問名 → 納吉 → 納徵 → 請期 → 親迎',1],
+ ['問名 → 納采 → 納徵 → 納吉 → 親迎 → 請期',0],
+ ['納采 → 納吉 → 問名 → 請期 → 納徵 → 親迎',0],
+ ['納吉 → 納采 → 問名 → 納徵 → 親迎 → 請期',0]],
+ exp:'「六禮」分別指納采、問名、納吉、納徵、請期、親迎。「三書」指聘書、禮書和迎書。'}});
+say('qian','「三書呢？聘書、禮書、迎書——分別什麼時候用？」');
+say('wan','「聘書用於訂親，禮書列明禮品清單，迎書用於迎娶當日。文書為憑，正是『*禮者，所以示信也*』。」');
+A({bg:'wedding',chars:[['wan','center','shy']]});
+say('n','紅燭搖曳。蘇婉站在燈影裡，忽然回頭。');
+say('wan','「{p}，你說……『合二姓之好』，是不是意味著，婚姻從來不只是兩個人的事？」');
+A({choices:[
+ {t:'「是。所以更要慎，更要敬。」',fx:{w:3,j:2},tip:'婉 加三　敬 加二'},
+ {t:'「也意味著兩個人要一起扛起兩個家族。」',fx:{w:2,x:2},tip:'婉 加二　學 加二'},
+ {t:'「不管如何，最要緊的是彼此相待以敬。」',fx:{w:4,j:1},tip:'婉 加四　敬 加一'}]});
+say('wan','（她低下頭，聲音很輕。）「相待以敬……這四個字，比什麼聘禮都重。」');
+say('n','黃昏已盡，星河初上。鼓樂聲中，{p}記下了這一日的儀節，也記下了別的什麼。');
+
+/* ---------- 第六章 喪禮 ---------- */
+ch('第 六 章','喪 禮','五服 · 做七 · 守孝');
+A({bg:'mourning',chars:[['master','left','serious'],['wan','right','sad']]});
+say('n','半月後，書院接到消息：子謙的祖父過世了。');
+say('master','「李子謙已歸鄉奔喪。今日這堂課，我們講『*凶禮*』。」');
+say('master','「傳統治喪儀制主要過程得以保留，但如喪儀、喪服制、孝服制等傳統已被『*簡化*』，完整依儒家舊制者已鮮有見聞。」');
+A({card:{t:'喪 禮 流 程',s:'七 個 階 段',rows:[
+ ['流 程','小殮 → 報喪 → 奔喪 → 停靈 → 守靈 → 大殮 → 出殯和下葬'],
+ ['小 殮','為逝者潔身更衣，初步入殮。'],
+ ['報 喪','遣人通告親友。'],
+ ['奔 喪','親友聞訊趕赴喪家。'],
+ ['停 靈','靈柩停置堂中。'],
+ ['守 靈','親屬日夜守護靈堂。'],
+ ['大 殮','正式入棺封殮。'],
+ ['出殯和下葬','送葬至墓地下葬，葬禮乃成。']]}});
+A({unlock:['sang']});
+A({card:{t:'做 七 · 守 孝 · 五 服',s:'儒 家 喪 制 三 要',rows:[
+ ['燒 七','親友每七天去靈堂看望並燒紙錢，一共去七次，共四十九天。還有類似的招魂、超渡、燒紙錢等活動，稱為「做七」。'],
+ ['斷 七','第四十九天的儀式稱為「斷七」，為正式葬禮部分的結束。'],
+ ['守 孝','按儒家的傳統實際服孝三期，每期九個月，共二十七個月，孝子應該守護在父母墓的周圍。'],
+ ['服孝期間','（實際上一般在百日內）不剃頭、刮臉、剪指甲、飲酒、夫妻同房、外出等；逢春節或親友舉辦慶典，亦不拜禮和慶賀。家中女眷也要素妝。'],
+ ['現 代','現代社會若家中有喪事，第一年春節不去各家拜年。'],
+ ['喪 服','為哀悼死者而穿的服裝。中國古代喪服自周代已用素服（素衣、素裳、素冠等），均取白色。'],
+ ['五 服','按服喪重輕、做工粗細、周期長短，分為五等：斬衰、齊衰、大功、小功、緦麻。']]}});
+A({unlock:['qi','shou','fu']});
+A({quiz:{q:'關於「做七」與「斷七」，下列何者正確？',o:[['每七天祭拜一次，共七次四十九天；第四十九天的儀式稱「斷七」',1],
+ ['每七天祭拜一次，共三次二十一天；第二十一天稱「斷七」',0],
+ ['「斷七」指出殯下葬當日',0],
+ ['「做七」是婚禮前的祈福儀式',0]],
+ exp:'燒七：親友每七天去靈堂看望並燒紙錢，一共去七次，共四十九天；招魂、超渡等活動稱為「做七」。第四十九天的儀式稱「斷七」，為正式葬禮部分的結束。'}});
+A({bg:'mourning',chars:[['qian','center','sad'],['wan','left','sad']]});
+say('n','四十九日後，子謙回來了。他瘦了一圈，衣袖上還縫著粗麻。');
+say('qian','「我祖父走的那天，我一直想，行這麼多禮，到底做給誰看？」');
+say('qian','「後來守靈到第五夜，我替祖父整理他生前用的硯臺，忽然就哭了。那一刻我才懂——」');
+A({choices:[
+ {t:'「禮不是做給死者看的，是讓活著的心有處可去。」',fx:{j:3,q:3,x:1},tip:'敬 加三　謙 加三　學 加一'},
+ {t:'「禮把無處安放的悲傷，安置進了程序裡。」',fx:{x:3,q:2},tip:'學 加三　謙 加二'},
+ {t:'（什麼也不說，只是拍拍他的肩。）',fx:{q:4,w:1},tip:'謙 加四　婉 加一'}]});
+say('qian','「……對。就是這樣。」（子謙的眼眶紅了，卻笑了。）');
+say('master','（夫子不知何時立在門外。）「*喪禮，與其易也，寧戚*。禮的形式可簡，那份『戚』，卻是不可簡的。」');
+say('wan','「所以『五服』分五等，不是為了比較誰更悲傷，而是讓*親疏有別、哀有等差*，讓每個人知道自己該如何安放這份情。」');
+say('master','「記住了：禮者，*飾情*也。情為本，文為飾。本飾相稱，方謂之禮。」');
+
+/* ---------- 第七章 曲禮 ---------- */
+ch('第 七 章','曲 禮 六 章','毋不敬 · 人生百年 · 為人子 · 侍坐');
+A({bg:'hall',chars:[['master','center','normal']]});
+say('master','「從今日起，正式讀《禮記》〈曲禮〉。先問題解。」');
+A({card:{t:'何 謂 〈曲 禮〉？',s:'兩 種 說 法',rows:[
+ ['一','《禮記》首篇篇名。分上、下兩篇。以其篇記吉（祭祀之禮）、凶（逢凶事時所舉行的哀弔禮）、賓（國際間的一種禮節）、軍（軍中的禮儀）、嘉（專指婚禮）五禮之事，明其委屈，故稱為「曲禮」。'],
+ ['二','多記禮文之細微曲折之處，尤其詳細於言語、飲食、灑掃、應對、進退之法與日常舉止中。']]}});
+A({unlock:['qu']});
+say('master','「本課課文皆選自〈曲禮〉，注重的是我們*生活上的表現*。共六段，一段一段來。」');
+
+A({scroll:{t:'曲 禮 · 一',s:'待 人 接 物 的 原 則 · 一 切 行 為 的 準 則 以 「敬」 為 基 礎',lines:['曲禮曰：','毋不敬，儼若思，','安定辭，安民哉！']}});
+A({bg:'hall',chars:[['master','left','serious'],['wan','right','normal'],['qian','center','think']]});
+A({card:{t:'注 釋',s:'曲 禮 · 一',rows:[
+ ['毋不敬','禮莫切於敬，應事接物，無一時一事不可以不敬。敬，自我警惕約束之意。'],
+ ['儼若思','儼通「嚴」，端莊持重。此言儀態端莊持重的樣子。'],
+ ['安定辭','說話謹慎、心平氣和的樣子。安：態度平和。定：論點明確，不模稜兩可。辭：說話。']]}});
+A({card:{t:'語 譯',s:'曲 禮 · 一',rows:[
+ ['全 句','《曲禮》說：一切行為準則皆以「敬」為基礎，態度要端莊持重、若有所思的樣子，說話的時候亦要平和，論點明確、不模稜兩可。這樣才能夠使人信服。']]}});
+A({unlock:['q1']});
+say('master','「三個層次：*心*（毋不敬）、*貌*（儼若思）、*言*（安定辭）。心、貌、言俱正，則『安民哉』。」');
+say('qian','「夫子，『毋不敬』——難道連討厭的人也要敬？」');
+say('master','「敬不是喜歡。敬是*不輕慢*。你可以不同意他，但不可不把他當人看。」');
+A({choices:[
+ {t:'「所以『敬』首先是自我約束，不是要求他人。」',fx:{j:3,x:1},tip:'敬 加三　學 加一'},
+ {t:'「儼若思——是要看起來像在思考，還是真的要思考？」',fx:{x:3},tip:'學 加三'},
+ {t:'「安定辭最難。人一生氣，話就散了。」',fx:{j:2,q:2},tip:'敬 加二　謙 加二'}]});
+say('master','「皆中肯。儼若思，不是*裝*出思考的樣子，而是心有所主，儀態自然端莊。」');
+
+A({scroll:{t:'曲 禮 · 二',s:'人 生 百 年 · 各 成 長 階 段 遵 從 禮 制 的 不 同 要 求',lines:['人生十年曰幼，學。二十曰弱，冠。','三十曰壯，有室。四十曰強，而仕。','五十曰艾，服官政。六十曰耆，指使。','七十曰老，而傳。八十九十曰耄，','七年曰悼。悼與耄，雖有罪不加刑焉。','百年曰期，頤。']}});
+A({bg:'hall',chars:[['master','center','normal']]});
+A({card:{t:'年 齒 十 階',s:'注 釋 · 一 覽',rows:[
+ ['十年曰幼','學——開始外出就學。'],
+ ['二十曰弱','冠——古代二十歲行冠禮，表示成年；體猶未壯，故曰弱。'],
+ ['三十曰壯','有室——室：家室，結婚後的小家庭。'],
+ ['四十曰強','而仕——仕：為士治理官府小事，引申為為社會服務。'],
+ ['五十曰艾','服官政——可以為大夫，擔任國家重要的工作。艾：經驗豐富，辦事老練。'],
+ ['六十曰耆','指使——耆，音ㄑㄧˊ，衰老。六十始年老體衰，可藉經驗指導分派工作給別人。'],
+ ['七十曰老','而傳——傳：七十告老不堪任事，把職責傳承交付後進。'],
+ ['八十九十曰耄','耄，音ㄇㄠˋ，衰老不再工作。'],
+ ['七年曰悼','悼：可憐愛的意思。指七歲以下之兒童。'],
+ ['悼與耄，雖有罪不加刑','悼者因年少無知，耄者衰老安養而已，雖一時犯錯也不加刑罰。'],
+ ['百年曰期，頤','期：指人生以百年為期，百歲時期已滿。頤，音ㄧˊ，養也。人生百歲惟尊老安養而已。']]}});
+A({unlock:['q2']});
+A({card:{t:'語 譯',s:'曲 禮 · 二',rows:[
+ ['全 段','人的一生，十歲時稱為「幼」，開始外出就學；到了二十歲時稱為「弱」，舉行加冠之禮；三十歲時稱作「壯」，已經結婚成立家室；四十歲時稱作「強」，可以出仕做小官；五十歲時稱作「艾」，可以執掌一方治理大眾之事；六十歲時稱作「耆」，能憑藉經驗指導別人做事；七十歲時稱為「老」，應把工作責任交付給後人；八十、九十歲時稱作「耄」。七歲以下的兒童被稱作「悼」。這些兒童和八十、九十歲的老人即使犯了罪，也不得施以刑罰。百歲稱作「期」，將得到社會的供養。']]}});
+A({quiz:{q:'依〈曲禮〉，下列年齡與稱謂的配對，何者正確？',o:[['二十曰弱，冠；五十曰艾，服官政',1],
+ ['三十曰強，而仕；四十曰壯，有室',0],
+ ['六十曰老，而傳；七十曰耆，指使',0],
+ ['十年曰幼，冠；百年曰耄，頤',0]],
+ exp:'十年曰幼（學）、二十曰弱（冠）、三十曰壯（有室）、四十曰強（而仕）、五十曰艾（服官政）、六十曰耆（指使）、七十曰老（而傳）、八十九十曰耄、七年曰悼、百年曰期（頤）。'}});
+A({bg:'garden',chars:[['wan','left','think'],['qian','right','serious']]});
+say('qian','「夫子，『*悼與耄，雖有罪不加刑焉*』——這句話，我一直想不通。」');
+say('wan','「我也想過。七歲的孩子偷了東西，八十的老人傷了人，真的可以完全不加刑嗎？」');
+say('qian','「那被傷害的人呢？他的『禮』，誰來替他行？」');
+A({choices:[
+ {t:'「禮的本意是憫幼恤老、教化為先；但現代仍須兼顧正義與被害人。」',fx:{x:3,j:2},tip:'學 加三　敬 加二'},
+ {t:'「不加刑不等於不教、不護、不償——責任換一種方式承擔。」',fx:{x:2,j:2,q:1},tip:'學 加二　敬 加二　謙 加一'},
+ {t:'「古代重教化，現代重法治，兩者不必強求一致。」',fx:{x:2,q:2},tip:'學 加二　謙 加二'}]});
+A({unlock:['dao']});
+say('master','（夫子在廊下聽完，緩緩走來。）「你們能問到這裡，書就沒有白讀。」');
+say('master','「『不加刑』的根據是：悼者*年少無知*，耄者*衰老安養*而已——責任能力不足，故以教化、監護代之。」');
+say('master','「但禮不是逃避責任的盾牌。今日法制對未成年與高齡者另有保護與減責之設計，同時也要顧及*被害人權益*與*社會正義*。」');
+say('master','「所以答案不是『是』或『否』，而是：*何以從輕，從輕到哪裡為止*。這纔是讀書人該想的。」');
+
+A({scroll:{t:'曲 禮 · 三',s:'為 人 子 如 何 孝 敬 父 母 與 尊 事 長 者 · 家 庭 倫 理 之 規 範',lines:['夫為人子者：','出必告，反必面，','所遊必有常，所習必有業。']}});
+A({bg:'study',chars:[['wan','center','normal']]});
+A({card:{t:'注 釋 與 語 譯',s:'曲 禮 · 三',rows:[
+ ['告','稟告，指稟告父母。'],
+ ['反','通「返」，返回。'],
+ ['面','面見父母。'],
+ ['遊','結交者。'],
+ ['習','修習者。'],
+ ['所遊必有常，所習必有業','結交品行端正的朋友，修習課程有一定進度，使個人進德修業日益增長，父母就能安心。'],
+ ['語 譯','為人子，出門必須將去處稟告父母，返回時也要先面見父母。結交品行端正的朋友，修習課程有一定進度，使個人進德修業日益增長，父母就能安心。']]}});
+A({unlock:['q3']});
+say('wan','「『出必告，反必面』——現代人覺得這太瑣碎了，出門還要報備？」');
+say('wan','「可是你想想，它的重點不是『報告行程』，而是*讓父母安心*。核心是『安親』，不是『管控』。」');
+say('wan','「『所遊必有常』是*交友*要有定準，『所習必有業』是*修業*要有進度。這兩句，說的其實是自我管理。」');
+A({choices:[
+ {t:'「所以我按時上課、謹慎交友，就是孝。」',fx:{j:2,x:2,w:1},tip:'敬 加二　學 加二　婉 加一'},
+ {t:'「『安親』二字最要緊。形式可變，心意不變。」',fx:{j:3,w:2},tip:'敬 加三　婉 加二'},
+ {t:'「可若父母要我結交我不認同的人呢？」',fx:{x:3,q:1},tip:'學 加三　謙 加一'}]});
+say('wan','「第三問最好。禮不是盲目的服從——『所遊必有常』的『常』，是*品行端正*，不是*父母喜歡*。」');
+
+A({scroll:{t:'曲 禮 · 四',s:'回 答 老 師 問 題 及 向 老 師 請 教 時 的 規 矩',lines:['侍坐於先生：','先生問焉，終則對。','請業則起，請益則起。']}});
+A({bg:'hall',chars:[['master','left','normal'],['qian','right','normal']]});
+A({card:{t:'注 釋 與 語 譯',s:'曲 禮 · 四',rows:[
+ ['終則對','指等問話終了後才能回答。'],
+ ['業','課業。'],
+ ['起','當起身請教老師。'],
+ ['益','進一步說明，課業有所不明白的地方，須要老師更詳加解說。'],
+ ['語 譯','侍候老師坐著時，老師發問，要等問話結束後再回答。課業有所不明白的地方，須要老師更詳加解說，當起身請教老師。']]}});
+A({unlock:['q4']});
+say('qian','「夫子，我上次就是您話還沒說完就搶答，被您瞪了一眼……」');
+say('master','「因為你*截斷*了我的話，也截斷了自己的思路。『終則對』不是形式，是讓你把問題聽完整。」');
+say('master','「『請業則起，請益則起』——為什麼要*起身*？」');
+A({choices:[
+ {t:'「以身體的動作，表達求知的鄭重。」',fx:{j:3,x:1},tip:'敬 加三　學 加一'},
+ {t:'「站起來，便不便於偷懶，也不便於輕慢。」',fx:{x:2,j:2},tip:'學 加二　敬 加二'},
+ {t:'「也是讓老師看清是誰在發問，便於指點。」',fx:{x:2,q:1},tip:'學 加二　謙 加一'}]});
+say('master','「三說皆通。禮的動作，從來都有*實用的理由*與*敬意的理由*，兩相合一。」');
+say('n','（自此以後，{p}每次發問前，都會不自覺地先把問題在心裡聽完一遍。）');
+
+A({scroll:{t:'曲 禮 · 五',s:'侍 坐 於 君 子 面 前 時 的 規 矩 · 生 活 禮 儀 的 常 規',lines:['侍坐於君子，','君子欠伸，撰杖屨，視日蚤莫，','侍坐者請出矣。']}});
+A({bg:'garden',chars:[['wan','left','smile'],['qian','right','think']]});
+A({card:{t:'注 釋 與 語 譯',s:'曲 禮 · 五',rows:[
+ ['侍 坐','陪伴長輩坐談。'],
+ ['欠 伸','打呵欠伸懶腰。'],
+ ['撰杖屨','撰，執持。尊長想找枴杖或拿鞋子。'],
+ ['蚤 莫','早晚。尊長探問時間早晚。以上所指之事皆示尊長有倦意。'],
+ ['語 譯','陪伴著長輩坐談，見尊長者打呵欠、伸懶腰，或想找枴杖或拿鞋子，或是探問時間早晚，侍坐者就該告辭退出。']]}});
+A({unlock:['q5']});
+say('qian','「這不就是……*察言觀色*嗎？」');
+say('wan','「對，而且要察得*體貼*。長輩不好意思說『你走吧』，於是打個呵欠、摸摸枴杖、問一句『幾時了』。」');
+say('wan','「若你看不出來，還滔滔不絕，那就是把自己的興致，壓在別人的疲憊之上。」');
+A({choices:[
+ {t:'「所以禮的最高形式，是替對方留出退路。」',fx:{j:3,w:2},tip:'敬 加三　婉 加二'},
+ {t:'「所以『應對進退』四字，重點在『退』。」',fx:{x:3,j:1},tip:'學 加三　敬 加一'},
+ {t:'「可如果長輩只是累了，卻還想聽我說完呢？」',fx:{x:2,q:2},tip:'學 加二　謙 加二'}]});
+say('wan','「第三問也好。所以〈曲禮〉才要『*明其委屈*』——曲折細微之處，正是需要用心判斷的地方。」');
+
+A({scroll:{t:'曲 禮 · 六',s:'君 子 所 應 具 的 品 德 要 求 · 進 德 修 業 的 圭 臬',lines:['博聞強識而讓，敦善行而不怠，','謂之君子。','君子不盡人之歡，不竭人之忠，','以全交也。']}});
+A({bg:'study',chars:[['master','center','normal']]});
+A({card:{t:'注 釋 與 語 譯',s:'曲 禮 · 六',rows:[
+ ['博聞強識而讓','見聞廣博記憶力強，且能謙讓不自滿，則所學日益精。'],
+ ['敦善行而不怠','修身踐言而力行不懈，則其德日益進。'],
+ ['不盡人之歡','君子不討好別人，以求別人對己無盡的歡喜。'],
+ ['不竭人之忠','君子也不期望別人，對自己全心全意的愛戴。竭：窮盡。'],
+ ['全 交','不勉強、不苛求，朋友之交才能長長久久。'],
+ ['語 譯','見聞廣博記憶力強，且能謙讓不自滿，則所學日益精；修身踐言而力行不懈，則其德日益進。這就叫做君子。君子不討好別人，以求別人對己無盡的歡喜；君子也不期望別人，對自己全心全意的愛戴。不勉強、不苛求，朋友之交才能長長久久。']]}});
+A({unlock:['q6']});
+say('master','「這一段，是全課的*結穴*。」');
+say('master','「『*博聞強識*』是學，『*而讓*』是德；『*敦善行*』是行，『*而不怠*』是恆。學、德、行、恆四者具，方謂之君子。」');
+say('master','「後半段講交友：不要*榨乾*別人對你的歡喜，也不要*榨乾*別人對你的忠誠。」');
+say('master','「人情如水，汲之無度則涸。不勉強、不苛求，交情才能長久——這叫『*全交*』。」');
+A({choices:[
+ {t:'「所以最好的關係，是彼此都留有餘地。」',fx:{j:2,x:2,w:2},tip:'敬 加二　學 加二　婉 加二'},
+ {t:'「『不竭人之忠』——對下屬、對朋友，都不該予取予求。」',fx:{x:3,j:1},tip:'學 加三　敬 加一'},
+ {t:'「夫子，那您對我們，也是『不盡其歡』嗎？」',fx:{q:3,j:1},tip:'謙 加三　敬 加一'}]});
+say('master','（夫子難得地笑了。）「我對你們，只有一件事從不客氣——就是*要求你們讀書*。」');
+A({bg:'bamboo',chars:[['wan','left','smile'],['qian','right','smile']]});
+say('n','竹林月色，三人並肩而坐。誰都沒有說話，卻誰都覺得安適。');
+say('wan','「原來這就是『不盡人之歡，不竭人之忠』。」');
+say('qian','「也原來……這就是『全交』。」');
+
+/* ---------- 第八章 總結與今用 ---------- */
+ch('第 八 章','總 結 與 今 用','由修身至社會');
+A({bg:'hall',chars:[['master','center','serious']]});
+say('master','「六章讀畢，作個總結。〈曲禮〉的三大禮類——」');
+A({card:{t:'〈曲 禮〉重 點 總 結',s:'三 大 禮 類',rows:[
+ ['一','尊師敬長之禮'],
+ ['二','孝親之禮'],
+ ['三','拜訪與待客之禮'],
+ ['蘊 含','〈曲禮〉內容蘊含親職教育、倫理教育、性別教育等面向。'],
+ ['層 次','內容包含從個人修身、生活常規、待人接物、家庭倫理，進而擴展至生命的實踐。'],
+ ['意 義','正可提供現今家庭教育的參考。']]}});
+A({unlock:['sum']});
+A({card:{t:'曲 禮 四 大 精 神',s:'可 行 於 今 日',rows:[
+ ['一、尊重和謙讓','強調在待人接物中應謙虛有禮，如「毋不敬，儼若思」提倡謹慎和敬重他人。'],
+ ['二、守禮與規範','通過規定具體行為方式，讓人們在日常生活中遵守禮法，防止隨意和無序的行為。'],
+ ['三、尊卑有序','強調長幼尊卑的倫理秩序，例如「長者先，幼者後」，提倡按照身份和地位行事，維持社會穩定。'],
+ ['四、自律與內省','勉勵人們約束自己的行為，保持自律，並經常反省自身，以達到道德提升。']]}});
+A({unlock:['four']});
+A({bg:'modern',chars:[['wan','right','normal']]});
+say('n','結業前一日，夫子破例帶諸生下山，走進了今日的街市。');
+say('wan','「這裡和書院，簡直是兩個世界。可是……你看。」');
+say('wan','「車廂上有人讓座，那是『*長者先，幼者後*』；排隊不插隊，那是『*毋不敬*』；開會不搶話，那是『*終則對*』。」');
+A({card:{t:'禮 的 現 代 意 義',s:'三 點',rows:[
+ ['一','強調禮儀標準和行為規範，對現代社會建立良好的社會秩序和規範具有重要啟示。'],
+ ['二','強調倫理道德和內在修養，對於現代社會培養良好公民和個人品格具有積極意義。'],
+ ['三','蘊含豐富的思想內涵和生活智慧，對於當代社會的精神追求和價值觀提供了重要的參考。']]}});
+A({unlock:['now']});
+A({card:{t:'曲 禮 在 現 代 社 會 生 活 中 的 應 用',s:'由 個 人 至 社 會',rows:[
+ ['尊重他人','職場中、日常溝通、公共場合、社交媒體。'],
+ ['謙虛有禮','不自滿、不伐善——「博聞強識而讓」。'],
+ ['自律與反思','時間管理、內省修身。'],
+ ['建立秩序','家庭生活、社會層面。'],
+ ['文化活動中的應用','教育、企業文化。']]}});
+A({unlock:['apply']});
+say('master','「現在，考你們三個情境。」');
+A({quiz:{q:'情境一：社群媒體上，有人發表了你極不認同的觀點。依「毋不敬，安定辭」，最合適的做法是？',
+ o:[['就事論事，語氣平和、論點明確，不進行人身攻擊',1],
+ ['立即以激烈言詞反擊，表明立場',0],
+ ['轉發並加上嘲諷文字，讓更多人評斷',0],
+ ['完全不理會，但暗自記恨',0]],
+ exp:'「毋不敬」——不輕慢他人；「安定辭」——態度平和、論點明確、不模稜兩可。敬，是即使不同意，也不把人當作可以踐踏的對象。'}});
+A({quiz:{q:'情境二：會議中，主管的話尚未說完，你已想到絕佳答案。依「侍坐於先生：先生問焉，終則對」，應當？',
+ o:[['待其問話終了再回答，必要時起身陳述',1],
+ ['立刻打斷，以免錯過時機',0],
+ ['私下告知鄰座同事，請他代為發言',0],
+ ['沉默不語，會後再抱怨未被重視',0]],
+ exp:'「終則對」——指等問話終了後才能回答；「請業則起，請益則起」——有所請教，當起身以表鄭重。'}});
+A({quiz:{q:'情境三：到朋友家作客，朋友的祖父屢屢打呵欠、並起身尋找枴杖。依「侍坐於君子」，你應當？',
+ o:[['察覺長者倦意，主動告辭退出',1],
+ ['繼續暢談，因為話題正有趣',0],
+ ['詢問長者為何不耐煩',0],
+ ['請朋友把祖父勸回房內，繼續聚會',0]],
+ exp:'「君子欠伸，撰杖屨，視日蚤莫，侍坐者請出矣」——欠伸（打呵欠伸懶腰）、撰杖屨（執持枴杖鞋子）、視日蚤莫（探問時間早晚）皆示尊長有倦意，侍坐者當告辭退出。'}});
+A({bg:'bamboo',chars:[['wan','center','smile']]});
+say('wan','「夫子說，明日結業要行大考。你……準備好了嗎？」');
+A({choices:[
+ {t:'「準備好了。也想請師姐，明日與我同席。」',fx:{w:4,j:1},tip:'婉 加四　敬 加一'},
+ {t:'「書讀得差不多，心還不太定。」',fx:{x:2,j:1,w:1},tip:'學 加二　敬 加一　婉 加一'},
+ {t:'「考完之後，我們再來這片竹林。」',fx:{w:3,q:1},tip:'婉 加三　謙 加一'}]});
+say('wan','（蘇婉望著月色，輕輕點頭。）「好。到時候，我替你煮一壺茶。」');
+
+/* ---------- 終章 大考 ---------- */
+ch('終 章','結 業 大 考','十 二 問 · 定 其 品 第');
+A({bg:'hall',chars:[['master','center','serious'],['wan','left','normal'],['qian','right','normal']]});
+say('master','「結業大考，共十二問。答對者，*學*進；答錯者，亦有所得——錯處最記得住。」');
+say('master','「開始。」');
+A({quiz:{q:'第一問：「禮」的本字為何？',o:[['豊',1],['豐',0],['示',0],['豆',0]],
+ exp:'禮的本字為「豊」；因「豊」常被混淆為「豐」，所以在偏旁加上一個「示」字表示祭桌，變成現今的「禮」字。'}});
+A({quiz:{q:'第二問：甲骨文「豊」的頂部與底部，分別像什麼？',o:[['頂部就像兩串美玉，底部就像有支架的建鼓',1],
+ ['頂部像雙手捧物，底部像祭桌',0],['頂部像火焰，底部像青銅鼎',0],['頂部像禾穗，底部像器皿',0]],
+ exp:'在甲骨文中，「豊」的頂部就像兩串美玉，底部就像有支架的建鼓。合起來就是「擊鼓奏樂」，用美玉敬奉祖先和神靈。'}});
+A({quiz:{q:'第三問：「禮」字偏旁中的「示」，表示什麼？',o:[['祭桌',1],['神主牌',0],['雙手',0],['日與月',0]],
+ exp:'因為「豊」常被混淆為「豐」。所以在偏旁加上一個「示」字表示祭桌，變成現今的「禮」字。'}});
+A({quiz:{q:'第四問：下列何者「不是」禮的功用？',o:[['征伐四方、開疆闢土',1],['政治：禮因政治作用而建立',0],
+ ['文化：促進人類文化的發展',0],['教育與倫理：防人惡而導人善',0]],
+ exp:'禮的功用有四：政治（禮因政治作用而建立）、文化（促進人類文化的發展）、教育與倫理（防人惡而導人善）、社會（融合社會習慣，保持社會秩序）。'}});
+A({quiz:{q:'第五問：誰「制禮作樂」，將禮提升到治國綱領和社會生活的總規範？',o:[['西周 · 周公',1],['戰國 · 荀況',0],['漢 · 叔孫通',0],['唐 · 孔穎達',0]],
+ exp:'西周周公「制禮作樂」，將禮提升到治國綱領和社會生活的總規範。荀況為戰國時「禮」之集大成者；叔孫通協助漢高祖制訂漢朝宮廷禮儀；孔穎達為《禮記》作正義。'}});
+A({quiz:{q:'第六問：《荀子》中首見哪一篇專篇論禮？',o:[['〈禮論〉',1],['〈曲禮〉',0],['〈樂論〉',0],['〈勸學〉',0]],
+ exp:'戰國時期，荀況為「禮」之集大成，《荀子》中首見〈禮論〉專篇論禮。'}});
+A({quiz:{q:'第七問：《周禮》與《儀禮》的內容分別是？',o:[['《周禮》敘述周代的行政官制和職掌；《儀禮》記述古代習俗禮儀',1],
+ ['《周禮》記述習俗禮儀；《儀禮》敘述行政官制',0],
+ ['兩者皆為「禮的理論」',0],['《周禮》為孔子所撰；《儀禮》為戴聖所選',0]],
+ exp:'《周禮》敘述周代的行政官制和職掌（政治制度）；《儀禮》記述古代習俗禮儀（禮俗）；《禮記》是「禮的理論」。三者合稱「三禮」。'}});
+A({quiz:{q:'第八問：關於《禮記》成書，何者正確？',o:[['戴聖選四十九篇成《小戴禮記》，即今傳《禮記》',1],
+ ['戴德選四十九篇成《大戴禮記》，流傳至今',0],
+ ['鄭玄作正義，孔穎達作注',0],
+ ['《禮記》原有四十九篇，後擴為一百三十一篇',0]],
+ exp:'戴德選八十五篇為《大戴禮記》（亡）；戴聖選四十九篇為《小戴禮記》。東漢鄭玄作注，唐孔穎達作正義，後被收於《十三經》中，保存至今。'}});
+A({quiz:{q:'第九問：中國古代為何稱婚禮為「昏禮」？',o:[['因多在黃昏舉行',1],['因「昏」有昏昧之意，謂婚姻使人昏亂',0],
+ ['因新郎常昏睡不起',0],['因婚禮須徹夜不眠',0]],
+ exp:'中國古代稱婚禮為昏禮，因多在黃昏舉行。《禮記》：「昏禮者，將合二姓之好，上以事宗廟，而下以繼後世也，故君子重之。」'}});
+A({quiz:{q:'第十問：「三書」指哪些文書？',o:[['聘書、禮書、迎書',1],['納采書、問名書、請期書',0],
+ ['婚書、庚帖、聘禮單',0],['家書、休書、盟書',0]],
+ exp:'「三書」指在「六禮」過程中所用的文書，包括聘書、禮書和迎書。'}});
+A({quiz:{q:'第十一問：關於喪禮，下列何者正確？',o:[['第四十九天的儀式稱「斷七」，為正式葬禮部分的結束',1],
+ ['流程為：報喪 → 小殮 → 大殮 → 奔喪 → 停靈',0],
+ ['五服為：斬衰、齊衰、中功、小功、細麻',0],
+ ['守孝實際服孝一期，共九個月',0]],
+ exp:'喪禮流程為小殮→報喪→奔喪→停靈→守靈→大殮→出殯和下葬；五服為斬衰、齊衰、大功、小功、緦麻；守孝三期、每期九個月、共二十七個月。'}});
+A({quiz:{q:'第十二問：「博聞強識而讓，敦善行而不怠，謂之君子」——下列解讀何者最貼切？',
+ o:[['見聞廣博、記憶力強而能謙讓不自滿，修身踐言而力行不懈，方為君子',1],
+ ['只要博學多聞，即使驕傲也可稱為君子',0],
+ ['君子應盡人之歡、竭人之忠，以求交情深厚',0],
+ ['敦善行而不怠，意為行善之後便可行怠惰之事',0]],
+ exp:'「博聞強識而讓」則所學日益精；「敦善行而不怠」則其德日益進。君子不盡人之歡、不竭人之忠，以「全交」——不勉強、不苛求，朋友之交才能長長久久。'}});
+A({bg:'bamboo',chars:[['master','center','smile'],['wan','left','smile'],['qian','right','smile']]});
+say('master','「考畢。」（夫子闔上簡冊，望向{p}。）');
+say('master','「分數不重要。重要的是——從今日起，你走在路上、坐在席上、開口說話時，心裡有沒有那個『*敬*』字。」');
+say('qian','「{p}，多謝你這一年的陪伴。我從一個連『豊』和『豐』都分不清的人，變成能背〈曲禮〉的人了。」');
+say('wan','「……明年，你還會來這片竹林嗎？」');
+A({choices:[
+ {t:'「會。每年今日，都在這裡煮茶。」',fx:{w:5,j:2},tip:'婉 加五　敬 加二'},
+ {t:'「會。因為禮，是可以一輩子走的路。」',fx:{j:4,x:2},tip:'敬 加四　學 加二'},
+ {t:'「當然，還要帶子謙一起，免得他又搶答。」',fx:{q:4,w:2},tip:'謙 加四　婉 加二'}]});
+A({end:true});
+
+/* ============================================================
+   六、引擎
+============================================================ */
+let idx=0,typing=false,typeTimer=null,curText='',autoOn=false,skipOn=false;
+let stat={j:0,x:0,w:0,q:0},quizRight=0,quizTotal=0;
+let log=[],unlocked={},settings={speed:26,autoWait:1400};
+
+function applyFx(fx){if(!fx)return;let changed=false;
+  Object.keys(fx).forEach(k=>{if(stat[k]!==undefined){stat[k]+=fx[k];changed=true;
+    const el=$('#s_'+k);if(el){el.querySelector('b').textContent=stat[k];el.classList.remove('up');void el.offsetWidth;el.classList.add('up');}}});
+  if(changed)Snd.chime();}
+function doUnlock(u){if(!u)return;const add=(u instanceof Array)?u:[u];let newly=[];
+  add.forEach(id=>{if(!unlocked[id]){unlocked[id]=1;newly.push(id);}});
+  if(newly.length){let nm='';
+    CODEX.forEach(c=>c.items.forEach(i=>{if(i.id===newly[0])nm=i.n;}));
+    toast('禮 典 新 增 ：'+(nm||newly[0]));}}
+function unlockedCount(){return Object.keys(unlocked).length;}
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600);}
+
+function setSpeaker(sp){
+  const n=$('#name');
+  if(!sp||sp==='n'){n.textContent='';}
+  else if(sp==='you'){n.textContent=PNAME;}
+  else n.textContent=NAME[sp]||'';
+  highlight(sp==='n'?'':sp);
+}
+function typeOut(txt,cb){
+  const el=$('#text');typing=true;el.innerHTML='';curText=fmt(txt);
+  const raw=curText,tokens=[];let buf='',i=0;
+  for(let k=0;k<raw.length;k++){const c=raw[k];
+    if(c==='<'){const e=raw.indexOf('>',k);if(e<0){tokens.push(c);}else{tokens.push(raw.slice(k,e+1));k=e;}}
+    else tokens.push(c);}
+  clearInterval(typeTimer);
+  typeTimer=setInterval(()=>{
+    buf+=tokens[i];i++;el.innerHTML=buf;
+    if(i>=tokens.length){clearInterval(typeTimer);typing=false;$('#next').classList.add('show');if(cb)cb();}
+  },settings.speed);
+  el._full=curText;
+}
+function showNode(i){
+  if(i>=S_.length)return showEnding();
+  idx=i;const n=S_[i];
+  if(n.bg)setBG(n.bg);
+  if(n.chars!==undefined&&n.chars!==null)setChars(n.chars);
+  if(n.fx)applyFx(n.fx);
+  if(n.unlock)doUnlock(n.unlock);
+  if(n.chapter)return showChapter(n.chapter,i);
+  if(n.scroll)return showScroll(n.scroll,i);
+  if(n.card)return showCard(n.card,i);
+  if(n.choices)return showChoices(n.choices,i);
+  if(n.quiz)return showQuiz(n.quiz,i);
+  if(n.end)return showEnding();
+  if(!n.t){showNode(i+1);return;}
+  setSpeaker(n.sp);
+  log.push({sp:(n.sp==='you'?PNAME:(NAME[n.sp]||'')),t:plain(n.t)});
+  if(log.length>260)log.shift();
+  typeOut(n.t,()=>{
+    if(autoOn)setTimeout(()=>{if(autoOn&&!typing)advance();},settings.autoWait+(n.t||'').length*22);
+    if(skipOn)setTimeout(()=>{if(skipOn)advance();},55);});
+}
+function advance(){
+  if(typing){clearInterval(typeTimer);$('#text').innerHTML=$('#text')._full||curText;typing=false;$('#next').classList.add('show');return;}
+  Snd.click();showNode(idx+1);
+}
+function showChapter(c,i){
+  const el=$('#chapterCard');
+  el.querySelector('.no').textContent=c.n;
+  el.querySelector('.ti').textContent=c.t;
+  el.querySelector('.sb').textContent=c.s;
+  el.classList.add('show');Snd.gong();
+  setTimeout(()=>{el.classList.remove('show');showNode(i+1);},2700);
+}
+function showScroll(s,i){
+  const ov=$('#ov');
+  ov.innerHTML='<div class="scrollbox"><h3>'+fmt(s.t)+'</h3><div class="sub">'+fmt(s.s)+'</div>'+
+    '<div class="orig">'+s.lines.map(fmt).join('<br>')+'</div><div class="sealst">禮</div></div>'+
+    '<div class="ovhint">點 擊 繼 續</div>';
+  ov.classList.add('show');ov.onclick=()=>{ov.classList.remove('show');Snd.page();showNode(i+1);};
+  Snd.gong();
+}
+function showCard(c,i){
+  const ov=$('#ov');
+  const rows=c.rows.map(r=>'<tr><th>'+fmt(r[0])+'</th><td>'+fmt(r[1])+'</td></tr>').join('');
+  ov.innerHTML='<div class="scrollbox"><h3>'+fmt(c.t)+'</h3><div class="sub">'+fmt(c.s||'')+'</div>'+
+    '<div class="bd"><table class="tbl">'+rows+'</table></div><div class="sealst">記</div></div>'+
+    '<div class="ovhint">點 擊 繼 續</div>';
+  ov.classList.add('show');ov.onclick=()=>{ov.classList.remove('show');Snd.page();showNode(i+1);};
+  Snd.page();
+}
+function showChoices(list,i){
+  setSpeaker('');$('#text').innerHTML='';$('#name').textContent='';$('#next').classList.remove('show');
+  const box=$('#choices');
+  box.innerHTML='<div class="ctitle">— 請 擇 一 而 行 —</div>'+
+    list.map((c,k)=>'<button class="ch" data-k="'+k+'">'+fmt(c.t)+(c.tip?'<small>'+c.tip+'</small>':'')+'</button>').join('');
+  box.classList.add('show');
+  [].forEach.call(box.querySelectorAll('.ch'),b=>{b.onclick=e=>{e.stopPropagation();
+    const c=list[+b.getAttribute('data-k')];Snd.chime();
+    log.push({sp:PNAME,t:plain(c.t)});
+    box.classList.remove('show');applyFx(c.fx);
+    $('#text').innerHTML='<em>▸ '+fmt(c.t)+'</em>';
+    setTimeout(()=>showNode(i+1),640);};});
+}
+function showQuiz(q,i){
+  quizTotal++;
+  $('#name').textContent='考 題';$('#next').classList.remove('show');$('#text').innerHTML='';
+  const box=$('#choices');
+  const order=q.o.map((o,k)=>({o:o,k:k})).sort(()=>Math.random()-0.5);
+  box.innerHTML='<div class="ctitle">'+fmt(q.q)+'</div>'+
+    order.map(x=>'<button class="ch" data-k="'+x.k+'">'+fmt(x.o[0])+'</button>').join('');
+  box.classList.add('show');
+  [].forEach.call(box.querySelectorAll('.ch'),b=>{b.onclick=e=>{e.stopPropagation();
+    const x=order[+b.getAttribute('data-k')];const ok=x.o[1];
+    [].forEach.call(box.querySelectorAll('.ch'),bb=>{bb.style.pointerEvents='none';});
+    b.classList.add(ok?'ok':'no');
+    if(ok){quizRight++;stat.x+=2;$('#s_x').querySelector('b').textContent=stat.x;
+      $('#s_x').classList.remove('up');void $('#s_x').offsetWidth;$('#s_x').classList.add('up');Snd.chime();}
+    else{Snd.wrong();[].forEach.call(box.querySelectorAll('.ch'),bb=>{if(order[+bb.getAttribute('data-k')].o[1])bb.classList.add('ok');});}
+    log.push({sp:'考題',t:plain(q.q)+' → '+(ok?'答對':'答錯')});
+    idx=i;
+    setTimeout(()=>{
+      box.classList.remove('show');
+      $('#name').textContent='解 說';
+      typeOut((ok?'◎ 答對了。':'✕ 再想想。')+' '+q.exp,()=>{
+        if(autoOn)setTimeout(()=>{if(autoOn&&!typing)advance();},settings.autoWait+900);
+        if(skipOn)setTimeout(()=>{if(skipOn)advance();},60);});
+    },1150);
+  };});
+}
+
+/* ---- 結局 ---- */
+function showEnding(){
+  autoOn=skipOn=false;$('#btnAuto').classList.remove('act');$('#btnSkip').classList.remove('act');
+  const tot=stat.j+stat.x+stat.w+stat.q;
+  let rank,ep;
+  if(quizRight>=11&&stat.j>=24&&stat.w>=22){rank='大 成 之 器';
+    ep='夫子親書「大成之器」四字贈你。他說：禮之為道，你已不只是記得，而是活在了身上。<br><br>那日竹林，蘇婉煮了一壺茶。她說：「以後每年今日，我都會在這裡。」<br>你答：「好。這便是我們的『請期』。」';}
+  else if(quizRight>=9&&stat.x>=26){rank='博 聞 君 子';
+    ep='「博聞強識而讓，敦善行而不怠，謂之君子。」<br>夫子以〈曲禮〉之言評你：所學日益精，所記日益廣。<br>唯願你更進一層——把「讓」字，也讀進骨子裡。';}
+  else if(stat.j>=26){rank='敦 善 之 士';
+    ep='你的「敬」，眾人皆見。出必告、反必面，侍坐則終則對，交友則不盡其歡。<br>夫子說：學問可以慢慢補，這份不肯輕慢人的心，最難得。';}
+  else if(quizRight>=7&&tot>=60){rank='循 禮 之 士';
+    ep='你循規蹈矩，進退有度，已可謂知禮之人。<br>只是夫子提醒你：禮貴在「誠」，不在「熟」。下一步，是把儀節背後的*心意*，也一併接住。';}
+  else{rank='待 琢 之 璞';
+    ep='「玉不琢，不成器。」<br>你入門時日尚短，許多儀節還生疏，許多義理還未透。<br>但夫子說：肯坐下、肯提問、肯承認自己不懂——這已是「毋不敬」的開端。明年，再來。';}
+  $('#eStat').innerHTML=[['敬',stat.j],['學',stat.x],['婉',stat.w],['謙',stat.q],['答對',quizRight+' / '+quizTotal],['禮典',unlockedCount()+' / '+ALL_IDS.length]]
+    .map(s=>'<div><b>'+s[1]+'</b>'+s[0]+'</div>').join('');
+  $('#eRank').textContent=rank;$('#eText').innerHTML=fmt(ep);
+  $('#ending').classList.add('show');Snd.gong();
+  saveTo('auto',true);
+}
+
+/* ---- 存檔 / 讀檔 ---- */
+const KEY='liji_galgame_v1';
+function saveTo(slot,silent){
+  let chapNode={chapter:{n:'',t:''}};
+  for(let k=idx;k>=0;k--){if(S_[k].chapter){chapNode=S_[k];break;}}
+  const d={idx:idx,stat:stat,quizRight:quizRight,quizTotal:quizTotal,log:log.slice(-160),
+    unlocked:Object.keys(unlocked),name:PNAME,chap:chapNode.chapter,ts:new Date().toLocaleString('zh-TW')};
+  const all=JSON.parse(localStorage.getItem(KEY)||'{}');all[slot]=d;
+  localStorage.setItem(KEY,JSON.stringify(all));
+  if(!silent)toast('已 保 存 至 卷 '+slot);
+}
+function loadFrom(slot){
+  const all=JSON.parse(localStorage.getItem(KEY)||'{}');
+  if(!all[slot]){toast('此 卷 尚 無 記 錄');return false;}
+  const d=all[slot];idx=d.idx;stat=d.stat;quizRight=d.quizRight||0;quizTotal=d.quizTotal||0;
+  log=d.log||[];unlocked={};(d.unlocked||[]).forEach(id=>{unlocked[id]=1;});
+  PNAME=d.name||'子衿';
+  ['j','x','w','q'].forEach(k=>$('#s_'+k).querySelector('b').textContent=stat[k]);
+  $('#pname').value=PNAME;closeModal();
+  $('#title').classList.add('hide');$('#ending').classList.remove('show');
+  curBg=null;Object.keys(charState).forEach(k=>{charState[k].el.remove();delete charState[k];});
+  showNode(idx);toast('已 讀 取 卷 '+slot);return true;
+}
+
+/* ---- 視窗 ---- */
+function openModal(kind){
+  const m=$('#modal'),t=$('#mTitle'),b=$('#mBody'),tabs=$('#mTabs');
+  tabs.innerHTML='';b.innerHTML='';m.classList.add('show');
+  if(kind==='save'||kind==='load'){
+    t.textContent=kind==='save'?'保 存 卷 軸':'讀 取 卷 軸';
+    const all=JSON.parse(localStorage.getItem(KEY)||'{}');
+    b.innerHTML='<div class="slots">'+[1,2,3,4,5,6].map(s=>{const d=all[s];
+      return '<div class="slot" data-s="'+s+'">'+(d
+        ? '<div class="st">卷 '+s+' · '+(d.chap.n||'')+' '+(d.chap.t||'')+'</div><div class="sd">'+d.ts+'<br>敬 '+d.stat.j+'　學 '+d.stat.x+'　婉 '+d.stat.w+'　謙 '+d.stat.q+'<br>禮典 '+((d.unlocked||[]).length)+' / '+ALL_IDS.length+'</div>'
+        : '<div class="st">卷 '+s+'</div><div class="em">— 空 白 卷 軸 —</div>')+'</div>';}).join('')+'</div>';
+    [].forEach.call(b.querySelectorAll('.slot'),el=>{el.onclick=()=>{const s=el.getAttribute('data-s');
+      Snd.click();if(kind==='save')saveTo(s);else loadFrom(s);};});
+  }
+  else if(kind==='log'){
+    t.textContent='回 顧 · 前 情';
+    b.innerHTML=log.length?log.map(l=>'<div class="logline">'+(l.sp?'<b>'+l.sp+'</b>':'')+l.t+'</div>').join(''):'<div class="logline">尚無記錄。</div>';
+    b.scrollTop=b.scrollHeight;
+  }
+  else if(kind==='codex'){
+    t.textContent='禮 典 · 知 識 庫';
+    tabs.innerHTML=CODEX.map((c,i)=>'<div class="tab'+(i===0?' on':'')+'" data-i="'+i+'">'+c.cat+'</div>').join('');
+    const render=i=>{const c=CODEX[i];
+      b.innerHTML='<div style="font-size:13px;color:#8f7c58;letter-spacing:3px;margin-bottom:12px">已習得 '+unlockedCount()+' / '+ALL_IDS.length+' 條</div>'+
+      c.items.map(it=>{const ok=!!unlocked[it.id];
+        return '<div class="cx'+(ok?'':' lock')+'"><div class="h"><span class="dot"></span>'+(ok?it.n:'尚未習得 · 待劇情解鎖')+'</div>'+(ok?'<div class="b">'+it.b+'</div>':'')+'</div>';}).join('');
+      [].forEach.call(b.querySelectorAll('.cx:not(.lock) .h'),h=>{h.onclick=()=>{h.parentElement.classList.toggle('open');Snd.click();};});};
+    [].forEach.call(tabs.querySelectorAll('.tab'),tb=>{tb.onclick=()=>{
+      [].forEach.call(tabs.querySelectorAll('.tab'),x=>x.classList.remove('on'));
+      tb.classList.add('on');render(+tb.getAttribute('data-i'));Snd.click();};});
+    render(0);
+  }
+  else if(kind==='set'){
+    t.textContent='設 定';
+    b.innerHTML='<div class="setrow"><label>文字速度</label><input type="range" id="rSpeed" min="6" max="70" value="'+(80-settings.speed)+'"><span id="vSpeed" style="width:80px"></span></div>'+
+    '<div class="setrow"><label>自動等待</label><input type="range" id="rAuto" min="400" max="3600" step="100" value="'+settings.autoWait+'"><span id="vAuto" style="width:80px"></span></div>'+
+    '<div class="setrow"><label>音樂</label><button class="mb" id="sMusic">'+(Snd.isOn()?'開 啟 中':'已 靜 音')+'</button></div>'+
+    '<div class="setrow"><label>學生姓名</label><input type="text" id="sName" maxlength="6" value="'+PNAME+'"></div>'+
+    '<div class="setrow"><label>操作方式</label><span class="tip">點擊對話框或按空白鍵：推進劇情<br>按住「控制」鍵：快進<br>視窗開啟時按「結束」鍵：關閉</span></div>';
+    const rs=$('#rSpeed'),ra=$('#rAuto');
+    const upd=()=>{$('#vSpeed').textContent=(80-rs.value)+' 字／秒';$('#vAuto').textContent=(ra.value/1000).toFixed(1)+' 秒';};
+    rs.oninput=()=>{settings.speed=80-rs.value;upd();};ra.oninput=()=>{settings.autoWait=+ra.value;upd();};upd();
+    $('#sMusic').onclick=()=>{const on=Snd.toggle();$('#sMusic').textContent=on?'開 啟 中':'已 靜 音';$('#btnMusic').classList.toggle('act',on);};
+    $('#sName').onchange=e=>{PNAME=(e.target.value||'').trim()||'子衿';};
+  }
+  else if(kind==='about'){
+    t.textContent='本 作 說 明';
+    b.innerHTML='<div class="cx open"><div class="h"><span class="dot"></span>關於本作</div><div class="b">'+
+    '<p>本作為依據《禮記》選（〈曲禮〉）教材與「禮之概談」補充講義編撰之<span class="k">古風視覺小說</span>。</p>'+
+    '<p><span class="k">劇情結構：</span>序章（禮之定義）→ 字源 → 禮之用 → 禮樂崩壞 → 三禮成書 → 昏禮 → 喪禮 → 曲禮六章 → 總結與今用 → 結業大考。</p>'+
+    '<p><span class="k">數值系統：</span>敬（恭敬自律）、學（學識）、婉（蘇婉好感）、謙（同窗情誼）。選擇與答題皆會影響數值，並決定結業評第與結局。</p>'+
+    '<p><span class="k">禮典：</span>隨劇情自動收錄知識條目，可隨時查閱複習，共 '+ALL_IDS.length+' 條。</p>'+
+    '<p><span class="k">結局：</span>大成之器／博聞君子／敦善之士／循禮之士／待琢之璞。</p>'+
+    '<p><span class="k">操作：</span>點擊對話框或按空白鍵推進；按住「控制」鍵快進；「自動」鈕可自動演進；「音樂」鈕可開關琴音。</p>'+
+    '<p style="color:#8f7c58">※ 琴音為瀏覽器即時合成之古琴泛音，無外部音檔。</p></div></div>';
+  }
+}
+function closeModal(){$('#modal').classList.remove('show');}
+[].forEach.call(document.querySelectorAll('.mb[data-m]'),b=>{b.onclick=()=>{Snd.click();openModal(b.getAttribute('data-m'));};});
+$('#mClose').onclick=()=>{Snd.click();closeModal();};
+$('#dialog').onclick=()=>{if(!$('#choices').classList.contains('show'))advance();};
+
+$('#btnAuto').onclick=()=>{autoOn=!autoOn;skipOn=false;$('#btnAuto').classList.toggle('act',autoOn);$('#btnSkip').classList.remove('act');
+  Snd.click();toast(autoOn?'自 動 演 進 · 開':'自 動 演 進 · 關');
+  if(autoOn&&!typing)setTimeout(()=>{if(autoOn&&!typing)advance();},400);};
+$('#btnSkip').onclick=()=>{skipOn=!skipOn;autoOn=false;$('#btnSkip').classList.toggle('act',skipOn);$('#btnAuto').classList.remove('act');
+  Snd.click();toast(skipOn?'快 進 · 開':'快 進 · 關');if(skipOn&&!typing)setTimeout(()=>{if(skipOn)advance();},60);};
+$('#btnMusic').onclick=()=>{const on=Snd.toggle();$('#btnMusic').classList.toggle('act',on);
+  toast(on?'琴 音 · 起':'琴 音 · 歇');};
+$('#btnTitle').onclick=()=>{Snd.click();if(confirm('返回標題？未保存的進度將遺失。'))location.reload();};
+
+addEventListener('keydown',e=>{
+  if(!$('#title').classList.contains('hide')){if(e.key==='Enter')$('#bStart').click();return;}
+  if(e.key==='Escape'){if($('#modal').classList.contains('show'))closeModal();return;}
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();
+    if($('#ov').classList.contains('show')){$('#ov').click();return;}
+    if($('#chapterCard').classList.contains('show'))return;
+    if(!$('#choices').classList.contains('show'))advance();return;}
+  if(e.key==='Control'&&!skipOn)$('#btnSkip').click();
+});
+addEventListener('keyup',e=>{if(e.key==='Control'&&skipOn)$('#btnSkip').click();});
+
+/* ---- 標題畫面 ---- */
+$('#tbg').innerHTML=SC.dawn;
+$('#pname').oninput=e=>{PNAME=((e.target.value||'').trim()).slice(0,6)||'子衿';};
+function startGame(fromLoad){
+  Snd.init();Snd.gong();
+  PNAME=(($('#pname').value||'').trim())||'子衿';
+  $('#title').classList.add('hide');
+  $('#btnMusic').classList.toggle('act',Snd.isOn());
+  if(!fromLoad){idx=0;stat={j:0,x:0,w:0,q:0};log=[];unlocked={};quizRight=0;quizTotal=0;
+    ['j','x','w','q'].forEach(k=>$('#s_'+k).querySelector('b').textContent=0);
+    curBg=null;Object.keys(charState).forEach(k=>{charState[k].el.remove();delete charState[k];});}
+  showNode(idx);
+}
+$('#bStart').onclick=()=>startGame(false);
+$('#bCont').onclick=()=>{Snd.init();
+  const all=JSON.parse(localStorage.getItem(KEY)||'{}');
+  if(all.auto){const d=all.auto;
+    PNAME=d.name||'子衿';$('#pname').value=PNAME;
+    idx=d.idx;stat=d.stat;log=d.log||[];quizRight=d.quizRight||0;quizTotal=d.quizTotal||0;
+    unlocked={};(d.unlocked||[]).forEach(id=>{unlocked[id]=1;});
+    ['j','x','w','q'].forEach(k=>$('#s_'+k).querySelector('b').textContent=stat[k]);
+    startGame(true);toast('續 讀 前 卷');}
+  else toast('尚 無 存 檔 · 請 自 「始 入 書 院」 開 始');};
+$('#bCodex').onclick=()=>{Snd.init();Snd.click();openModal('codex');};
+$('#bSet').onclick=()=>{Snd.init();Snd.click();openModal('set');};
+$('#bAbout').onclick=()=>{Snd.init();Snd.click();openModal('about');};
+$('#eAgain').onclick=()=>location.reload();
+$('#eCodex').onclick=()=>{Snd.click();openModal('codex');};
+
+/* ---- 動畫 ---- */
+const st=document.createElement('style');st.textContent=
+'.mist{animation:drift 34s linear infinite}.mist.m2{animation-duration:46s;animation-direction:reverse}.mist.m3{animation-duration:28s}'+
+'@keyframes drift{0%{transform:translateX(-90px)}50%{transform:translateX(90px)}100%{transform:translateX(-90px)}}'+
+'.flame{animation:flick 1.6s ease-in-out infinite;transform-origin:center bottom}.flame.f2{animation-duration:2.1s;animation-delay:.3s}'+
+'@keyframes flick{0%,100%{opacity:.95;transform:scale(1)}50%{opacity:.72;transform:scale(1.08) translateY(-2px)}}'+
+'.smoke,.smoke2{animation:smk 9s ease-in-out infinite}@keyframes smk{0%{opacity:.06;transform:translateY(0)}50%{opacity:.24}100%{opacity:.06;transform:translateY(-26px)}}'+
+'.beam{animation:bmp 8s ease-in-out infinite}.beam.b2{animation-duration:11s}@keyframes bmp{0%,100%{opacity:.1}50%{opacity:.19}}'+
+'.lant{animation:sway 6.5s ease-in-out infinite;transform-origin:top center}.lant.l2{animation-duration:8s;animation-delay:-2s}'+
+'@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}'+
+'.glow{animation:gl 3.4s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.85}50%{opacity:.55}}'+
+'.fly circle{animation:fl 4.6s ease-in-out infinite}.fly circle:nth-child(2n){animation-duration:6.2s}'+
+'@keyframes fl{0%,100%{opacity:.15}50%{opacity:1}}'+
+'.rip{animation:rpl 12s linear infinite}.rip.r1{animation-duration:16s}.rip.r2{animation-duration:20s}'+
+'@keyframes rpl{0%{transform:translateX(0)}100%{transform:translateX(-80px)}}'+
+'.cnd{animation:cndf 5s ease-in-out infinite}@keyframes cndf{0%,100%{opacity:1}50%{opacity:.86}}';
+document.head.appendChild(st);
+</script>
+</body>
+</html>
